@@ -1,11 +1,13 @@
 package io.defter.core.app.gui;
 
-import io.defter.core.app.api.IssueCommand;
+import io.defter.core.app.api.CreateExpenseGroup;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -21,12 +23,12 @@ public class BulkIssuer {
     public BulkIssuer(CommandGateway commandGateway, int number, int amount, Consumer<BulkIssuer> callback) {
         remaining.set(number);
         new Thread(() -> {
-            for(int i = 0; i < number; i++) {
+            for (int i = 0; i < number; i++) {
                 String id = UUID.randomUUID().toString().substring(0, 11).toUpperCase();
                 commandGateway
-                        .send(new IssueCommand(id, amount))
+                        .send(new CreateExpenseGroup(id, "name", "USD", new ArrayList<>()))
                         .whenComplete((Object o, Throwable throwable) -> {
-                            if(throwable == null) {
+                            if (throwable == null) {
                                 success.incrementAndGet();
                             } else {
                                 error.incrementAndGet();
@@ -43,7 +45,7 @@ public class BulkIssuer {
                     Thread.sleep(1000);
                 }
                 callback.accept(this);
-            } catch(InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 log.error("Interrupted", ex);
             }
         }).start();
