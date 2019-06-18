@@ -1,6 +1,6 @@
 type Query {
     groups: [Group]!
-    #    affiliations: [Member]!
+    affiliations: [Member]!
     #    splits(groupId: String!): [Split]!
     #    settlement(groupId: String!): Settlement!
 }

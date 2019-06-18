@@ -18,6 +18,9 @@ data class UserView(@Id var id: String, var username: String, var avatar: String
 }
 
 @Entity
+@NamedQueries(
+        NamedQuery(name = "UserAffiliateView.fetchByUserId", query = "SELECT c FROM UserAffiliateView c WHERE c.userId = :userId ORDER BY c.id")
+)
 data class UserAffiliateView(@Id var id: String, var userId: String, var friendId: String) {
     constructor() : this("", "", "")
 }

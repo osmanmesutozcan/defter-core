@@ -29,6 +29,9 @@ public class ExpenseGroup {
     @CommandHandler
     public ExpenseGroup(CreateExpenseGroup command) {
         log.debug("handling {}", command);
+        if(command.getMembers().size() < 2) {
+            throw new IllegalStateException("Group needs at least 2 members");
+        }
         apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
         command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
     }

@@ -32,6 +32,7 @@ public class Mutation implements GraphQLMutationResolver {
     //groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!
     public String addSplitToGroup(String groupId, String payedBy, Double total, String description) {
         AddSplitToGroup command = new AddSplitToGroup(groupId, total, payedBy, description, "");
-        return commandGateway.sendAndWait(command);
+        commandGateway.sendAndWait(command);
+        return groupId;
     }
 }
