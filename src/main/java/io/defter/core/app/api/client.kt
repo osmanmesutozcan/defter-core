@@ -10,3 +10,4 @@ data class FetchExpenseGroupViewsQuery(val offset: Int, val limit: Int, val filt
 
 data class UserViewFilter(val usernameStartsWith: String = "")
 data class FetchUserViewsQuery(val offset: Int, val limit: Int, val filter: UserViewFilter)
+data class FetchUserViewsByIds(val ids: List<String>)

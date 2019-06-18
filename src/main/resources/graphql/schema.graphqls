@@ -1,27 +1,16 @@
 type Query {
     groups: [Group]!
-#    affiliations: [Member]!
-#    splits(groupId: String!): [Split]!
-#    settlement(groupId: String!): Settlement!
+    #    affiliations: [Member]!
+    #    splits(groupId: String!): [Split]!
+    #    settlement(groupId: String!): Settlement!
 }
 
 type Mutation {
-#    createGroup(createGroupInput: CreateGroupInput): String!
-#    addSplitToGroup(addSplitToGroupInput: AddSplitToGroupInput): String!
-}
-
-input CreateGroupInput {
-    name: String!
-    members: [String]!
-    currency: String!
-}
-
-input AddSplitToGroupInput {
-    groupId: String!
-    payedBy: String!
-    total: Int!
-    description: String!
-    members: [SplitMemberInput]!
+    createUser(username: String!): String!
+    createGroup(name: String! currency: String! members: [String]!): String!
+    addSplitToGroup(groupId: String! payedBy: String! total: Int! description: String!
+#        members: [SplitMemberInput]!
+    ): String!
 }
 
 input SplitMemberInput {
@@ -34,17 +23,15 @@ type Group {
     id: String!
     name: String!
     currency: String!
-#    updateAt: String!
+    #    updateAt: String!
     balance: Float!
     numberOfSplits: Int!
-
-#    members: [Member]!
+    members: [Member]!
 }
 
 type Member {
     id: String!
-    name: String!
-    email: String!
+    username: String!
     avatar: String!
 }
 

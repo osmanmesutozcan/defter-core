@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -31,16 +32,26 @@ public class ExpenseGroupViewProjection {
                 event.getName(),
                 event.getCurrency(),
                 .0,
-                0
+                0,
+                new ArrayList<>()
         ));
+    }
+
+    @EventHandler
+    public void on(MemberAddedToGroup event) {
+        log.debug("projecting {}", event);
+        ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getId());
+        List<String> members = group.getMembers();
+        members.add(event.getMemberId());
+        group.setMembers(members);
     }
 
     @EventHandler
     public void on(SplitAddedToGroup event) {
         log.debug("projecting {}", event);
-        ExpenseGroupView summary = entityManager.find(ExpenseGroupView.class, event.getId());
-        summary.setBalance(summary.getBalance() + event.getAmount());
-        summary.setNumberOfSplits(summary.getNumberOfSplits() + 1);
+        ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getId());
+        group.setBalance(group.getBalance() + event.getAmount());
+        group.setNumberOfSplits(group.getNumberOfSplits() + 1);
     }
 
     @QueryHandler

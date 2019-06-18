@@ -8,6 +8,8 @@ import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.springframework.context.annotation.Profile;
 
+import java.util.stream.Collectors;
+
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 
 @XSlf4j
@@ -25,9 +27,10 @@ public class ExpenseGroup {
     }
 
     @CommandHandler
-    public ExpenseGroup(CreateExpenseGroup cmd) {
-        log.debug("handling {}", cmd);
-        apply(new ExpenseGroupCreated(cmd.getId(), cmd.getName(), cmd.getCurrency()));
+    public ExpenseGroup(CreateExpenseGroup command) {
+        log.debug("handling {}", command);
+        apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
+        command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
     }
 
     @CommandHandler
@@ -37,9 +40,9 @@ public class ExpenseGroup {
     }
 
     @EventSourcingHandler
-    public void on(ExpenseGroupCreated evt) {
-        id = evt.getId();
-        name = evt.getName();
-        currency = evt.getCurrency();
+    public void on(ExpenseGroupCreated event) {
+        id = event.getId();
+        name = event.getName();
+        currency = event.getCurrency();
     }
 }
