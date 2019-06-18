@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 public class DefterCommandConfiguration {
 
     @Bean
-    public Repository<ExpenseGroup> expenseGroupRepository(EventStore eventStore, Cache cache) {
+    public Repository<ExpenseGroup> giftCardRepository(EventStore eventStore, Cache cache) {
         return EventSourcingRepository.builder(ExpenseGroup.class)
-                                      .cache(cache)
-                                      .eventStore(eventStore)
-                                      .build();
+                .cache(cache)
+                .eventStore(eventStore)
+                .build();
     }
 
     @Bean

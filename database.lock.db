@@ -1,6 +1,0 @@
-#FileLock
-#Fri Jun 14 13:08:07 EET 2019
-server=127.0.1.1\:39313
-hostName=shuttle
-method=file
-id=16b557563529a8677e5768bc989fead6fedf8343960
