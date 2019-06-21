@@ -6,13 +6,54 @@ import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-data class CreateUser(@TargetAggregateIdentifier val id: String, @NotNull @Size(min = 5) val username: String)
-data class UserCreated(val id: String, val username: String)
+/**
+ * User
+ */
+data class CreateUser(
+        @TargetAggregateIdentifier val id: String,
+        @NotNull @Size(min = 5) val username: String
+)
 
-data class CreateExpenseGroup(@TargetAggregateIdentifier val id: String, @NotNull @Size(min = 5) val name: String, val currency: Currency, val members: List<String>)
-data class ExpenseGroupCreated(val id: String, val name: String, val currency: Currency, val members: List<String>)
+data class UserCreated(
+        val id: String,
+        val username: String
+)
 
-data class MemberAddedToGroup(@TargetAggregateIdentifier val id: String, val memberId: String)
+data class CreateExpenseGroup(
+        @TargetAggregateIdentifier val id: String,
+        @NotNull @Size(min = 5) val name: String,
+        val currency: Currency,
+        val members: List<String>
+)
 
-data class AddSplitToGroup(@TargetAggregateIdentifier val id: String, @NotNull @Min(0, message = "Amount must be present") val amount: Double, val payedBy: String, val description: String, val submittedBy: String, val createdAt: Date)
-data class SplitAddedToGroup(val id: String, val amount: Double, val payedBy: String, val description: String, val submittedBy: String, val createdAt: Date)
+data class ExpenseGroupCreated(
+        val id: String,
+        val name: String,
+        val currency: Currency,
+        val members: List<String>
+)
+
+data class MemberAddedToGroup(
+        @TargetAggregateIdentifier val id: String,
+        val memberId: String
+)
+
+data class AddSplitToGroup(
+        @TargetAggregateIdentifier val id: String,
+        @NotNull @Min(0, message = "Amount must be present") val amount: Double,
+        val payedBy: String,
+        val description: String,
+        val submittedBy: String,
+        val createdAt: Date,
+        val members: List<SplitMember>
+)
+
+data class SplitAddedToGroup(
+        val id: String,
+        val amount: Double,
+        val payedBy: String,
+        val description: String,
+        val submittedBy: String,
+        val createdAt: Date,
+        val members: List<SplitMember>
+)

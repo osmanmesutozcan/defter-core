@@ -21,87 +21,94 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @ProcessingGroup(QueryConstants.USER_PROCCESSOR)
 public class UserViewProjection {
-    private final EntityManager entityManager;
 
-    @EventHandler
-    public void on(UserCreated event) {
-        log.debug("projecting {}", event);
-        entityManager.persist(new UserView(event.getId(), event.getUsername(), ""));
+  private final EntityManager entityManager;
+
+  @EventHandler
+  public void on(UserCreated event) {
+    log.debug("projecting {}", event);
+    entityManager.persist(new UserView(event.getId(), event.getUsername(), ""));
+  }
+
+  @EventHandler
+  public void on(ExpenseGroupCreated event) {
+    log.debug("projecting {}", event);
+
+    List<String> members = event.getMembers();
+    members.forEach(member -> {
+      List<String> friends = members
+          .stream()
+          .filter(m -> !member.contains(m))
+          .collect(Collectors.toList());
+
+      friends.forEach(friend -> saveAffiliation(member, friend));
+    });
+
+  }
+
+  private void saveAffiliation(String member, String friend) {
+    // Here we cannot use class level entityManager because we want to catch the
+    // unique contraint error.
+    String id = UUID.randomUUID().toString();
+
+    TypedQuery<Long> jpaQuery = entityManager
+        .createNamedQuery("UserAffiliateView.exists", Long.class);
+    jpaQuery.setParameter("userId", member);
+    jpaQuery.setParameter("friendId", friend);
+
+    if (jpaQuery.getResultList().size() > 0) {
+      log.warn("skipped affiliate relation from {} to {}", member, friend);
+      return;
     }
 
-    @EventHandler
-    public void on(ExpenseGroupCreated event) {
-        log.debug("projecting {}", event);
+    entityManager.persist(new UserAffiliateView(id, member, friend));
+  }
 
-        List<String> members = event.getMembers();
-        members.forEach(member -> {
-            List<String> friends = members
-                    .stream()
-                    .filter(m -> !member.contains(m))
-                    .collect(Collectors.toList());
+  @QueryHandler
+  public List<UserView> handle(FetchUserViewsQuery query) {
+    log.trace("handling {}", query);
+    TypedQuery<UserView> jpaQuery = entityManager
+        .createNamedQuery("UserView.fetch", UserView.class);
+    jpaQuery.setParameter("usernameStartsWith", query.getFilter().getUsernameStartsWith());
+    jpaQuery.setFirstResult(query.getOffset());
+    jpaQuery.setMaxResults(query.getLimit());
+    return log.exit(jpaQuery.getResultList());
+  }
 
-            friends.forEach(friend -> saveAffiliation(member, friend));
-        });
+  @QueryHandler
+  public List<UserView> handle(FetchUserViewsByIds query) {
+    log.trace("handling {}", query);
+    TypedQuery<UserView> jpaQuery = entityManager
+        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
+    jpaQuery.setParameter("idsList", query.getIds());
+    return log.exit(jpaQuery.getResultList());
+  }
 
-    }
+  @QueryHandler
+  public List<SplitView> handle(FetchExpenseGroupsSplitsQuery query) {
+    log.trace("handling {}", query);
+    TypedQuery<SplitView> jpaQuery = entityManager
+        .createNamedQuery("SplitView.fetch", SplitView.class);
+    jpaQuery.setParameter("groupId", query.getGroupId());
+    return log.exit(jpaQuery.getResultList());
+  }
 
-    private void saveAffiliation(String member, String friend) {
-        // Here we cannot use class level entityManager because we want to catch the
-        // unique contraint error.
-        String id = UUID.randomUUID().toString();
+  @QueryHandler
+  public List<UserView> on(FetchUserAffiliatesQuery query) {
+    log.trace("handling {}", query);
+    TypedQuery<UserAffiliateView> affiliatesQuery = entityManager
+        .createNamedQuery("UserAffiliateView.fetchByUserId", UserAffiliateView.class);
+    affiliatesQuery.setParameter("userId", query.getUserId());
 
-        TypedQuery<Long> jpaQuery =  entityManager.createNamedQuery("UserAffiliateView.exists", Long.class);
-        jpaQuery.setParameter("userId", member);
-        jpaQuery.setParameter("friendId", friend);
+    List<String> affiliates = affiliatesQuery.getResultList()
+        .stream()
+        .map(UserAffiliateView::getFriendId)
+        .collect(Collectors.toList());
 
-        if (jpaQuery.getResultList().size() > 0) {
-            log.warn("skipped affiliate relation from {} to {}", member, friend);
-            return;
-        }
+    TypedQuery<UserView> usersQuery = entityManager
+        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
+    usersQuery.setParameter("idsList", affiliates);
 
-        entityManager.persist(new UserAffiliateView(id, member, friend));
-    }
-
-    @QueryHandler
-    public List<UserView> handle(FetchUserViewsQuery query) {
-        log.trace("handling {}", query);
-        TypedQuery<UserView> jpaQuery = entityManager.createNamedQuery("UserView.fetch", UserView.class);
-        jpaQuery.setParameter("usernameStartsWith", query.getFilter().getUsernameStartsWith());
-        jpaQuery.setFirstResult(query.getOffset());
-        jpaQuery.setMaxResults(query.getLimit());
-        return log.exit(jpaQuery.getResultList());
-    }
-
-    @QueryHandler
-    public List<UserView> handle(FetchUserViewsByIds query) {
-        log.trace("handling {}", query);
-        TypedQuery<UserView> jpaQuery = entityManager.createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
-        jpaQuery.setParameter("idsList", query.getIds());
-        return log.exit(jpaQuery.getResultList());
-    }
-
-    @QueryHandler
-    public List<SplitView> handle(FetchExpenseGroupsSplitsQuery query) {
-        log.trace("handling {}", query);
-        TypedQuery<SplitView> jpaQuery = entityManager.createNamedQuery("SplitView.fetch", SplitView.class);
-        jpaQuery.setParameter("groupId", query.getGroupId());
-        return log.exit(jpaQuery.getResultList());
-    }
-
-    @QueryHandler
-    public List<UserView> on(FetchUserAffiliatesQuery query) {
-        log.trace("handling {}", query);
-        TypedQuery<UserAffiliateView> affiliatesQuery = entityManager.createNamedQuery("UserAffiliateView.fetchByUserId", UserAffiliateView.class);
-        affiliatesQuery.setParameter("userId", query.getUserId());
-
-        List<String> affiliates = affiliatesQuery.getResultList()
-                .stream()
-                .map(UserAffiliateView::getFriendId)
-                .collect(Collectors.toList());
-
-        TypedQuery<UserView> usersQuery = entityManager.createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
-        usersQuery.setParameter("idsList", affiliates);
-
-        return log.exit(usersQuery.getResultList());
-    }
+    return log.exit(usersQuery.getResultList());
+  }
 }
