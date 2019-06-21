@@ -13,3 +13,5 @@ data class FetchUserViewsQuery(val offset: Int, val limit: Int, val filter: User
 data class FetchUserViewsByIds(val ids: List<String>)
 
 data class FetchUserAffiliatesQuery(val userId: String)
+
+data class FetchExpenseGroupsSplitsQuery(val groupId: String)

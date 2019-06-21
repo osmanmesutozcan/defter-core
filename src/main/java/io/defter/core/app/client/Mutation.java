@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,8 @@ public class Mutation implements GraphQLMutationResolver {
 
     //groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!
     public String addSplitToGroup(String groupId, String payedBy, Double total, String description) {
-        AddSplitToGroup command = new AddSplitToGroup(groupId, total, payedBy, description, "");
+        Date createdAt = new Date();
+        AddSplitToGroup command = new AddSplitToGroup(groupId, total, payedBy, description, "", createdAt);
         commandGateway.sendAndWait(command);
         return groupId;
     }

@@ -39,7 +39,7 @@ public class ExpenseGroup {
     @CommandHandler
     public void handle(AddSplitToGroup cmd) {
         log.debug("handling {}", cmd);
-        apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(), cmd.getSubmittedBy()));
+        apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(), cmd.getSubmittedBy(), cmd.getCreatedAt()));
     }
 
     @EventSourcingHandler

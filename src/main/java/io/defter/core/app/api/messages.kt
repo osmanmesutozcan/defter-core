@@ -1,6 +1,7 @@
 package io.defter.core.app.api
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier
+import java.util.*
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
@@ -13,5 +14,5 @@ data class ExpenseGroupCreated(val id: String, val name: String, val currency: C
 
 data class MemberAddedToGroup(@TargetAggregateIdentifier val id: String, val memberId: String)
 
-data class AddSplitToGroup(@TargetAggregateIdentifier val id: String, @NotNull @Min(0, message = "Amount must be present") val amount: Double, val payedBy: String, val description: String, val submittedBy: String)
-data class SplitAddedToGroup(val id: String, val amount: Double, val payedBy: String, val description: String, val submittedBy: String)
+data class AddSplitToGroup(@TargetAggregateIdentifier val id: String, @NotNull @Min(0, message = "Amount must be present") val amount: Double, val payedBy: String, val description: String, val submittedBy: String, val createdAt: Date)
+data class SplitAddedToGroup(val id: String, val amount: Double, val payedBy: String, val description: String, val submittedBy: String, val createdAt: Date)

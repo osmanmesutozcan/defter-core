@@ -1,7 +1,7 @@
 type Query {
     groups: [Group]!
     affiliations: [Member]!
-    #    splits(groupId: String!): [Split]!
+    splits(groupId: String!): [Split]!
     #    settlement(groupId: String!): Settlement!
 }
 
@@ -40,7 +40,7 @@ type Split {
     total: Int!
     groupId: String!
     description: String!
-    members: [SplitMember]!
+#    members: [SplitMember]!
     payedBy: Member!
     submittedBy: Member!
 }

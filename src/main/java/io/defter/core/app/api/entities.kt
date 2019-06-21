@@ -1,6 +1,9 @@
 package io.defter.core.app.api
 
+import org.springframework.data.annotation.CreatedDate
+import java.util.*
 import javax.persistence.*
+import kotlin.collections.ArrayList
 
 enum class Currency {
     USD,
@@ -19,8 +22,10 @@ data class UserView(@Id var id: String, var username: String, var avatar: String
 
 @Entity
 @NamedQueries(
+        NamedQuery(name = "UserAffiliateView.exists", query = "SELECT COUNT(c) FROM UserAffiliateView c WHERE c.userId = :userId AND c.friendId = :friendId"),
         NamedQuery(name = "UserAffiliateView.fetchByUserId", query = "SELECT c FROM UserAffiliateView c WHERE c.userId = :userId ORDER BY c.id")
 )
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["userId", "friendId"])])
 data class UserAffiliateView(@Id var id: String, var userId: String, var friendId: String) {
     constructor() : this("", "", "")
 }
@@ -32,4 +37,12 @@ data class UserAffiliateView(@Id var id: String, var userId: String, var friendI
 )
 data class ExpenseGroupView(@Id var id: String, var name: String, var currency: Currency, var balance: Double, var numberOfSplits: Int, @ElementCollection(targetClass = String::class) var members: List<String>) {
     constructor() : this("", "", Currency.USD, .0, 0, ArrayList<String>())
+}
+
+@Entity
+@NamedQueries(
+        NamedQuery(name = "SplitView.fetch", query = "SELECT c FROM SplitView c WHERE c.groupId = :groupId ORDER BY c.createdAt")
+)
+data class SplitView(@Id var id: String, var total: Double, var groupId: String, var description: String, var payedBy: String, var submittedBy: String, var createdAt: Date) {
+    constructor() : this("", .0, "", "", "", "", Date())
 }

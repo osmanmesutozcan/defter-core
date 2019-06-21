@@ -22,9 +22,16 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public List<UserView> affiliations() {
-        FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery("8a02f8ef-eab4-47a3-98b1-0c05d26af046");
+        FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery("a1be090c-b221-4d69-bd1c-3a8ad7914941");
         return queryGateway
                 .query(query, ResponseTypes.multipleInstancesOf(UserView.class))
+                .join();
+    }
+
+    public List<SplitView> splits(String groupId) {
+        FetchExpenseGroupsSplitsQuery query = new FetchExpenseGroupsSplitsQuery(groupId);
+        return queryGateway
+                .query(query, ResponseTypes.multipleInstancesOf(SplitView.class))
                 .join();
     }
 }

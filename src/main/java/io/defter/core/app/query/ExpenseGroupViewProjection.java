@@ -14,13 +14,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
-@Component
 @XSlf4j
-@RequiredArgsConstructor
+@Component
 @Profile("query")
-@ProcessingGroup("query")
+@RequiredArgsConstructor
+@ProcessingGroup(QueryConstants.EXPENSE_GROUP_PROCCESSOR)
 public class ExpenseGroupViewProjection {
     private final EntityManager entityManager;
 
@@ -52,6 +54,9 @@ public class ExpenseGroupViewProjection {
         ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getId());
         group.setBalance(group.getBalance() + event.getAmount());
         group.setNumberOfSplits(group.getNumberOfSplits() + 1);
+
+        String id = UUID.randomUUID().toString();
+        entityManager.persist(new SplitView(id, event.getAmount(), event.getId(), event.getDescription(), event.getPayedBy(), event.getSubmittedBy(), event.getCreatedAt()));
     }
 
     @QueryHandler
