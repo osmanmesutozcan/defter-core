@@ -2,7 +2,7 @@ type Query {
     groups: [Group]!
     affiliations: [Member]!
     splits(groupId: String!): [Split]!
-    #    settlement(groupId: String!): Settlement!
+    settlement(groupId: String!): Settlement!
 }
 
 type Mutation {
@@ -50,12 +50,8 @@ type SplitMember {
 }
 
 type Settlement {
-    summary: SettlementSummary!
-    members: [SettlementMember]!
-}
-
-type SettlementSummary {
     totalSplits: Int!
+    members: [SettlementMember]!
 }
 
 type SettlementMember {

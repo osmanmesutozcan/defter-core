@@ -1,6 +1,5 @@
 package io.defter.core.app.api
 
-import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 import kotlin.collections.ArrayList
@@ -14,7 +13,8 @@ enum class Currency {
 @Entity
 @NamedQueries(
         NamedQuery(name = "UserView.fetch", query = "SELECT c FROM UserView c WHERE c.username LIKE CONCAT(:usernameStartsWith, '%') ORDER BY c.username"),
-        NamedQuery(name = "UserView.fetchWhereIdIn", query = "SELECT c FROM UserView c WHERE c.id IN (:idsList) ORDER BY c.username")
+        NamedQuery(name = "UserView.fetchWhereIdIn", query = "SELECT c FROM UserView c WHERE c.id IN (:idsList) ORDER BY c.username"),
+        NamedQuery(name = "UserView.fetchById", query = "SELECT c FROM UserView c WHERE c.id = :userId")
 )
 data class UserView(
         @Id var id: String,
@@ -46,7 +46,7 @@ data class UserAffiliateView(
 data class ExpenseGroupView(
         @Id var id: String,
         var name: String,
-        var currency: Currency,
+        var currency: Currency, // TODO: Enum this.
         var balance: Double,
         var numberOfSplits: Int,
         @ElementCollection(targetClass = String::class) var members: List<String>
@@ -76,3 +76,22 @@ data class SplitMember(var id: String, var locked: Boolean, var share: Float) {
     constructor() : this("", true, 0f)
 }
 
+@Entity
+@NamedQueries(
+        NamedQuery(name = "SettlementView.fetch", query = "SELECT c FROM SettlementView c WHERE c.groupId = :groupId"),
+        NamedQuery(name = "SettlementView.fetchForUser", query = "SELECT c FROM SettlementView c WHERE c.groupId = :groupId AND c.userId = :userId")
+)
+data class SettlementView(
+        @Id var id: String,
+        var userId: String,
+        var groupId: String,
+        var createdAt: Date,
+        @ElementCollection var balances: List<SettlementBalance>
+) {
+    constructor() : this("", "", "", Date(), ArrayList<SettlementBalance>())
+}
+
+@Embeddable
+data class SettlementBalance(var userId: String, var balance: Double) {
+    constructor() : this("", .0)
+}

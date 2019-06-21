@@ -1,6 +1,15 @@
 package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.config.ProcessingGroup;
@@ -17,15 +26,89 @@ import javax.persistence.EntityManager;
 @RequiredArgsConstructor
 @ProcessingGroup(QueryConstants.SETTLEMENT)
 public class SettlementViewProjection {
-    private final EntityManager entityManager;
 
-//    @EventHandler
-//    public void on(ExpenseGroupCreated event) {
-//        //
-//    }
-//
-//    @QueryHandler
-//    public void handle(FetchExpenseGroupsSplitsQuery query) {
-//        //
-//    }
+  private final EntityManager entityManager;
+
+  @EventHandler
+  public void on(ExpenseGroupCreated event) {
+    log.debug("projecting {}", event);
+
+    List<SettlementView> settlements = event.getMembers()
+        .stream()
+        .map(member -> createSettlementViewForMember(event.getMembers(), member, event.getId()))
+        .collect(Collectors.toList());
+
+    settlements.forEach(entityManager::persist);
+  }
+
+  private SettlementView createSettlementViewForMember(List<String> members, String currentMember, String groupId) {
+    List<SettlementBalance> balances = members
+        .stream()
+        .filter(m -> !m.equals(currentMember))
+        .map(m -> new SettlementBalance(m, 0))
+        .collect(Collectors.toList());
+
+    String id = UUID.randomUUID().toString();
+    return new SettlementView(id, currentMember, groupId, new Date(), balances);
+  }
+
+  @EventHandler
+  public void on(SplitAddedToGroup event) {
+    log.debug("projecting {}", event);
+    TypedQuery<SettlementView> settlementsQuery = entityManager
+        .createNamedQuery("SettlementView.fetch", SettlementView.class);
+    settlementsQuery.setParameter("groupId", event.getId());
+
+    Map<String, SplitMember> members = event.getMembers()
+        .stream()
+        .collect(Collectors.toMap(SplitMember::getId, c -> c));
+
+    settlementsQuery.getResultList()
+        .forEach(settlement -> {
+          List<SettlementBalance> balances = getUpdatedBalancesForView(event, settlement, members, event.getPayedBy());
+          settlement.setBalances(balances);
+        });
+  }
+
+  private List<SettlementBalance> getUpdatedBalancesForView(SplitAddedToGroup event, SettlementView settlement,
+      Map<String, SplitMember> members, String payedBy) {
+
+    return settlement.getBalances()
+        .stream()
+        .map(balance -> updateSettlementBalanceForView(balance, event, settlement, members, payedBy))
+        .collect(Collectors.toList());
+  }
+
+  private SettlementBalance updateSettlementBalanceForView(SettlementBalance balance, SplitAddedToGroup event,
+      SettlementView settlement, Map<String, SplitMember> members, String payedBy) {
+
+    // if this is paying users settlement record
+    // add payed amount to each users account on my book
+    if (payedBy.equals(settlement.getUserId())) {
+      SplitMember member = members.get(settlement.getUserId());
+      Double amount = event.getAmount() * (member.getShare() / 100);
+      return new SettlementBalance(member.getId(), balance.getBalance() - amount);
+    }
+
+    // if this is other users settlement record
+    // write debt to paying users account on other users book
+    if (payedBy.equals(balance.getUserId())) {
+      SplitMember member = members.get(balance.getUserId());
+      Double amount = event.getAmount() * (member.getShare() / 100);
+      return new SettlementBalance(member.getId(), balance.getBalance() + amount);
+    }
+
+    // Should never fall here.
+    return balance;
+  }
+
+  @QueryHandler
+  public SettlementView handle(FetchExpenseGroupSettlementQuery query) {
+    log.trace("handling {}", query);
+    TypedQuery<SettlementView> jpaQuery = entityManager
+        .createNamedQuery("SettlementView.fetchForUser", SettlementView.class);
+    jpaQuery.setParameter("userId", query.getUserId());
+    jpaQuery.setParameter("groupId", query.getGroupId());
+    return log.exit(jpaQuery.getSingleResult());
+  }
 }

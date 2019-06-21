@@ -85,6 +85,15 @@ public class UserViewProjection {
   }
 
   @QueryHandler
+  public UserView handle(FetchUserViewById query) {
+    log.trace("handling {}", query);
+    TypedQuery<UserView> jpaQuery = entityManager
+        .createNamedQuery("UserView.fetchById", UserView.class);
+    jpaQuery.setParameter("userId", query.getId());
+    return log.exit(jpaQuery.getSingleResult());
+  }
+
+  @QueryHandler
   public List<SplitView> handle(FetchExpenseGroupsSplitsQuery query) {
     log.trace("handling {}", query);
     TypedQuery<SplitView> jpaQuery = entityManager

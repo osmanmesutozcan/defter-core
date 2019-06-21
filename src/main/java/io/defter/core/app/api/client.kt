@@ -1,15 +1,13 @@
 package io.defter.core.app.api
 
-import javax.persistence.Embeddable
-
 /**
  * Expense Groups View
  */
-data class ExpenseGroupViewFilter(val idStartsWith: String = "")
 class CountExpenseGroupViewsQuery(val filter: ExpenseGroupViewFilter = ExpenseGroupViewFilter()) {
     override fun toString(): String = "CountExpenseGroupSummaryQuery"
 }
 
+data class ExpenseGroupViewFilter(val idStartsWith: String = "")
 data class FetchExpenseGroupViewsQuery(val offset: Int, val limit: Int, val filter: ExpenseGroupViewFilter)
 data class CountExpenseGroupViewsResponse(val count: Int, val lastEvent: Long)
 
@@ -18,6 +16,7 @@ data class CountExpenseGroupViewsResponse(val count: Int, val lastEvent: Long)
  */
 data class UserViewFilter(val usernameStartsWith: String = "")
 data class FetchUserViewsQuery(val offset: Int, val limit: Int, val filter: UserViewFilter)
+data class FetchUserViewById(val id: String)
 data class FetchUserViewsByIds(val ids: List<String>)
 
 /**

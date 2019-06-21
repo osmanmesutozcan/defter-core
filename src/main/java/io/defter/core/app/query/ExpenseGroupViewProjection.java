@@ -57,6 +57,7 @@ public class ExpenseGroupViewProjection {
 
     String id = UUID.randomUUID()
         .toString(); // TODO: Use client side generated id!. Id should not be generated in event handler to keep this method idempotent.
+
     entityManager.persist(
         new SplitView(id, event.getAmount(), event.getId(), event.getDescription(),
             event.getPayedBy(), event.getSubmittedBy(), event.getCreatedAt(), event.getMembers()));
