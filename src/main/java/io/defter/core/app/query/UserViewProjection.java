@@ -43,7 +43,6 @@ public class UserViewProjection {
 
       friends.forEach(friend -> saveAffiliation(member, friend));
     });
-
   }
 
   private void saveAffiliation(String member, String friend) {
@@ -56,7 +55,7 @@ public class UserViewProjection {
     jpaQuery.setParameter("userId", member);
     jpaQuery.setParameter("friendId", friend);
 
-    if (jpaQuery.getResultList().size() > 0) {
+    if (jpaQuery.getSingleResult().intValue() > 0) {
       log.warn("skipped affiliate relation from {} to {}", member, friend);
       return;
     }

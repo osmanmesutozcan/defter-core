@@ -2,13 +2,10 @@ package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
@@ -86,7 +83,7 @@ public class SettlementViewProjection {
     // add payed amount to each users account on my book
     if (payedBy.equals(settlement.getUserId())) {
       SplitMember member = members.get(settlement.getUserId());
-      Double amount = event.getAmount() * (member.getShare() / 100);
+      double amount = event.getAmount() * (member.getShare() / 100);
       return new SettlementBalance(member.getId(), balance.getBalance() - amount);
     }
 
@@ -94,7 +91,7 @@ public class SettlementViewProjection {
     // write debt to paying users account on other users book
     if (payedBy.equals(balance.getUserId())) {
       SplitMember member = members.get(balance.getUserId());
-      Double amount = event.getAmount() * (member.getShare() / 100);
+      double amount = event.getAmount() * (member.getShare() / 100);
       return new SettlementBalance(member.getId(), balance.getBalance() + amount);
     }
 

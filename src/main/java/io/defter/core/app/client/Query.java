@@ -26,7 +26,7 @@ public class Query implements GraphQLQueryResolver {
   }
 
   public List<UserView> affiliations() {
-    FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery("a1be090c-b221-4d69-bd1c-3a8ad7914941");
+    FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery("f2057425-c9cf-45e9-937f-7e32649ac5f8");
     return queryGateway
         .query(query, ResponseTypes.multipleInstancesOf(UserView.class))
         .join();

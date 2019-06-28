@@ -55,8 +55,9 @@ public class ExpenseGroupViewProjection {
     group.setBalance(group.getBalance() + event.getAmount());
     group.setNumberOfSplits(group.getNumberOfSplits() + 1);
 
+    // TODO: Use client side generated id!. Id should not be generated in event handler to keep this method idempotent.
     String id = UUID.randomUUID()
-        .toString(); // TODO: Use client side generated id!. Id should not be generated in event handler to keep this method idempotent.
+        .toString();
 
     entityManager.persist(
         new SplitView(id, event.getAmount(), event.getId(), event.getDescription(),

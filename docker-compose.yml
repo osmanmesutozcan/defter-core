@@ -6,3 +6,13 @@ services:
     ports:
       - 8124:8124
       - 8024:8024
+
+  postgres:
+    image: postgres:11
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: defteradmin
+      POSTGRES_PASSWORD: ak2na9axsn2eqds034
+      POSTGRES_DB: coredata

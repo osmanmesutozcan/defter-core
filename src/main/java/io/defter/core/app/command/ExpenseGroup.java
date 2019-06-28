@@ -15,35 +15,36 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @Profile("command")
 public class ExpenseGroup {
 
-    @AggregateIdentifier
-    private String id;
-    private String name;
-    private Currency currency;
+  @AggregateIdentifier
+  private String id;
+  private String name;
+  private Currency currency;
 
-    public ExpenseGroup() {
-        //
-    }
+  public ExpenseGroup() {
+    //
+  }
 
-    @CommandHandler
-    public ExpenseGroup(CreateExpenseGroup command) {
-        log.debug("handling {}", command);
-        if(command.getMembers().size() < 2) {
-            throw new IllegalStateException("Group needs at least 2 members");
-        }
-        apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
-        command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
+  @CommandHandler
+  public ExpenseGroup(CreateExpenseGroup command) {
+    log.debug("handling {}", command);
+    if (command.getMembers().size() < 2) {
+      throw new IllegalStateException("Group needs at least 2 members");
     }
+    apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
+    command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
+  }
 
-    @CommandHandler
-    public void handle(AddSplitToGroup cmd) {
-        log.debug("handling {}", cmd);
-        apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(), cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
-    }
+  @CommandHandler
+  public void handle(AddSplitToGroup cmd) {
+    log.debug("handling {}", cmd);
+    apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(),
+        cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
+  }
 
-    @EventSourcingHandler
-    public void on(ExpenseGroupCreated event) {
-        id = event.getId();
-        name = event.getName();
-        currency = event.getCurrency();
-    }
+  @EventSourcingHandler
+  public void on(ExpenseGroupCreated event) {
+    id = event.getId();
+    name = event.getName();
+    currency = event.getCurrency();
+  }
 }

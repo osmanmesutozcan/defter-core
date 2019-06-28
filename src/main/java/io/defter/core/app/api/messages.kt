@@ -33,6 +33,11 @@ data class ExpenseGroupCreated(
         val members: List<String>
 )
 
+data class InviteMemberToGroup(
+        @TargetAggregateIdentifier val id: String,
+        val memberId: String
+)
+
 data class MemberAddedToGroup(
         @TargetAggregateIdentifier val id: String,
         val memberId: String
