@@ -29,6 +29,7 @@ public class ExpenseGroup {
     if (command.getMembers().size() < 2) {
       throw new IllegalStateException("Group needs at least 2 members");
     }
+
     apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
     command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
   }
@@ -56,6 +57,28 @@ public class ExpenseGroup {
     }
     apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(),
         cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
+  }
+
+  @CommandHandler
+  public void handle(AcceptExpenseGroupInvitation event) {
+    apply(
+        new ExpenseGroupInvitationAccepted(
+            event.getGroupId(),
+            event.getInvitedUserId(),
+            event.getInvitationRequestId()
+        )
+    );
+  }
+
+  @CommandHandler
+  public void handle(RejectExpenseGroupInvitation event) {
+    apply(
+        new ExpenseGroupInvitationRejected(
+            event.getGroupId(),
+            event.getInvitedUserId(),
+            event.getInvitationRequestId()
+        )
+    );
   }
 
   @EventSourcingHandler

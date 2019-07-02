@@ -1,12 +1,10 @@
 package io.defter.core.app.command;
 
-import io.defter.core.app.api.AcceptAffiliationRequest;
-import io.defter.core.app.api.AffiliationRequestAccepted;
-import io.defter.core.app.api.AffiliationRequestRejected;
-import io.defter.core.app.api.AffiliationRequestSent;
+import io.defter.core.app.api.AcceptMemberInvitation;
+import io.defter.core.app.api.MemberInvitationAccepted;
+import io.defter.core.app.api.MemberInvitationRejected;
 import io.defter.core.app.api.CreateUser;
-import io.defter.core.app.api.RejectAffiliationRequest;
-import io.defter.core.app.api.SendAffiliationRequest;
+import io.defter.core.app.api.RejectMemberInvitation;
 import io.defter.core.app.api.UserCreated;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,52 +25,34 @@ public class User {
   @AggregateIdentifier
   private String id;
   private String email;
-  private Set<String> affiliations = new HashSet<>();
 
   @CommandHandler
   public User(CreateUser command) {
     log.debug("handling {}", command);
-    apply(new UserCreated(command.getId(), command.getUsername(), command.getEmail()));
+    // TODO: We should hash this password here.
+    apply(new UserCreated(command.getId(), command.getName(), command.getEmail(), command.getPassword()));
   }
 
   @CommandHandler
-  public void handle(SendAffiliationRequest command) {
+  public void handle(AcceptMemberInvitation command) {
     log.debug("handling {}", command);
-    if (affiliations.contains(command.getAffiliatingUserId())) {
-      return;
-    }
-
     apply(
-        new AffiliationRequestSent(
-            command.getUserId(),
-            command.getAffiliatingUserId(),
-            command.getAffiliationRequestId()
+        new MemberInvitationAccepted(
+            command.getInvitedUserId(),
+            command.getEmailId(),
+            command.getInvitationRequestId()
         )
     );
   }
 
   @CommandHandler
-  public void handle(AcceptAffiliationRequest command) {
+  public void handle(RejectMemberInvitation command) {
     log.debug("handling {}", command);
     apply(
-        new AffiliationRequestAccepted(
-            command.getUserId(),
-            command.getAffiliatingUserId(),
+        new MemberInvitationRejected(
+            command.getInvitedUserId(),
             command.getEmailId(),
-            command.getAffiliationRequestId()
-        )
-    );
-  }
-
-  @CommandHandler
-  public void handle(RejectAffiliationRequest command) {
-    log.debug("handling {}", command);
-    apply(
-        new AffiliationRequestRejected(
-            command.getUserId(),
-            command.getAffiliatingUserId(),
-            command.getEmailId(),
-            command.getAffiliationRequestId()
+            command.getInvitationRequestId()
         )
     );
   }
@@ -81,10 +61,5 @@ public class User {
   public void on(UserCreated event) {
     this.id = event.getId();
     this.email = event.getEmail();
-  }
-
-  @EventSourcingHandler
-  public void on(AffiliationRequestAccepted event) {
-    affiliations.add(event.getAffiliatingUserId());
   }
 }

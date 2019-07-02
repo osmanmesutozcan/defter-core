@@ -6,8 +6,10 @@ type Query {
 }
 
 type Mutation {
-    createUser(username: String!, email: String!): String!
+    login(email: String!, password: String!): AuthPayload!
+    createUser(name: String!, email: String!, password: String!): String!
     createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
+    answerToGroupInvitation(invitationRequestId: String, answer: InvitationAnswer): String!
     addSplitToGroup(groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!): String!
 }
 
@@ -20,6 +22,17 @@ input SplitMemberInput {
 input GroupMemberInput {
     id: String!
     email: String!
+}
+
+enum InvitationAnswer {
+    ACCEPTED
+    REJECTED
+}
+
+# TODO: Return current user
+type AuthPayload {
+    me: Member!
+    token: String!
 }
 
 type Group {
@@ -40,7 +53,7 @@ type GroupMember {
 type Member {
     id: String!
     email: String!
-    username: String!
+    name: String!
     avatar: String!
 }
 

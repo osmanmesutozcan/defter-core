@@ -1,6 +1,7 @@
 package io.defter.core.app.api
 
-import io.defter.core.app.saga.MemberAffiliationManagement
+import io.defter.core.app.saga.ExpenseGroupInvitationManagement
+import io.defter.core.app.saga.MemberInvitationManagement
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 import java.util.*
 import javax.validation.constraints.Email
@@ -13,71 +14,121 @@ import javax.validation.constraints.Size
  */
 data class CreateUser(
         @TargetAggregateIdentifier val id: String,
-        @NotNull @Size(min = 5) val username: String,
-        @NotNull @Email val email: String
+        @NotNull @Size(min = 5) val name: String,
+        @NotNull @Email val email: String,
+        @NotNull val password: String
 )
 
 data class UserCreated(
         val id: String,
-        val username: String,
-        val email: String
+        val name: String,
+        val email: String,
+        val passwordHash: String
 )
 
 /**
- * Affiliation
+ * New User Invitation
  */
-data class SendAffiliationRequest(
-        @TargetAggregateIdentifier val userId: String,
-        @NotNull val affiliatingUserId: String,
-        @NotNull val affiliationRequestId: String
+open class SendMemberInvitation(
+        @TargetAggregateIdentifier @NotNull val invitationRequestId: String,
+        @NotNull val invitedUserId: String
 )
 
-data class AffiliationRequestSent(
-        val userId: String,
-        val affiliatingUserId: String,
-        val affiliationRequestId: String
+data class MemberInvitationSent(
+        val invitationRequestId: String,
+        val invitedUserId: String
 )
 
-data class AnswerAffiliationRequest(
-        @TargetAggregateIdentifier val affiliationRequestId: String,
+data class AnswerMemberInvitation(
+        @TargetAggregateIdentifier val invitationRequestId: String,
         @NotNull val emailId: String,
-        @NotNull val answer: MemberAffiliationManagement.AffiliationAnswer
+        @NotNull val answer: MemberInvitationManagement.InvitationAnswer
 )
 
-data class AffiliationRequestAnswered(
-        val affiliationRequestId: String,
+data class MemberInvitationAnswered(
+        val invitationRequestId: String,
         val emailId: String,
-        val answer: MemberAffiliationManagement.AffiliationAnswer
+        val answer: MemberInvitationManagement.InvitationAnswer
 )
 
-data class AcceptAffiliationRequest(
-        @TargetAggregateIdentifier val userId: String,
-        @NotNull val affiliatingUserId: String,
-        @NotNull val affiliationRequestId: String,
+data class AcceptMemberInvitation(
+        @TargetAggregateIdentifier @NotNull val invitedUserId: String,
+        @NotNull val invitationRequestId: String,
         @NotNull val emailId: String
 )
 
-data class AffiliationRequestAccepted(
-        val userId: String,
-        val affiliatingUserId: String,
-        val affiliationRequestId: String,
+data class MemberInvitationAccepted(
+        val invitedUserId: String,
+        val invitationRequestId: String,
         val emailId: String
 )
 
-data class RejectAffiliationRequest(
-        @TargetAggregateIdentifier val userId: String,
-        @NotNull val affiliatingUserId: String,
-        @NotNull val affiliationRequestId: String,
+data class RejectMemberInvitation(
+        @TargetAggregateIdentifier @NotNull val invitedUserId: String,
+        @NotNull val invitationRequestId: String,
         @NotNull val emailId: String
 )
 
-data class AffiliationRequestRejected(
-        val userId: String,
-        val affiliatingUserId: String,
-        val affiliationRequestId: String,
+data class MemberInvitationRejected(
+        val invitedUserId: String,
+        val invitationRequestId: String,
         val emailId: String
 )
 
+/**
+ * Expense Group Invitation
+ */
+data class SendExpenseGroupInvitation(
+        @TargetAggregateIdentifier @NotNull val invitationRequestId: String,
+        @NotNull val invitedUserId: String,
+        @NotNull val groupId: String
+)
+
+data class ExpenseGroupInvitationSent(
+        val invitationRequestId: String,
+        val invitedUserId: String,
+        val groupId: String
+)
+
+data class AnswerExpenseGroupInvitation(
+        @TargetAggregateIdentifier val invitationRequestId: String,
+        @NotNull val answeredUserId: String,
+        @NotNull val answer: ExpenseGroupInvitationManagement.InvitationAnswer
+)
+
+data class ExpenseGroupInvitationAnswered(
+        val invitationRequestId: String,
+        val answeredUserId: String,
+        val answer: ExpenseGroupInvitationManagement.InvitationAnswer
+)
+
+data class AcceptExpenseGroupInvitation(
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val invitedUserId: String,
+        @NotNull val invitationRequestId: String
+)
+
+data class ExpenseGroupInvitationAccepted(
+        val groupId: String,
+        val invitedUserId: String,
+        val invitationRequestId: String
+)
+
+data class RejectExpenseGroupInvitation(
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val invitedUserId: String,
+        @NotNull val invitationRequestId: String
+)
+
+data class ExpenseGroupInvitationRejected(
+        val groupId: String,
+        val invitedUserId: String,
+        val invitationRequestId: String
+)
+
+/**
+ * Expense Group
+ */
 data class CreateExpenseGroup(
         @TargetAggregateIdentifier val id: String,
         @NotNull @Size(min = 5) val name: String,

@@ -1,5 +1,6 @@
 package io.defter.core.app.api
 
+import lombok.Data
 import java.util.*
 import javax.persistence.*
 import kotlin.collections.ArrayList
@@ -10,19 +11,23 @@ enum class Currency {
     EURO
 }
 
+@Data
 @Entity
 @NamedQueries(
-        NamedQuery(name = "UserView.fetch", query = "SELECT c FROM UserView c WHERE c.username LIKE CONCAT(:usernameStartsWith, '%') ORDER BY c.username"),
-        NamedQuery(name = "UserView.fetchWhereIdIn", query = "SELECT c FROM UserView c WHERE c.id IN (:idsList) ORDER BY c.username"),
-        NamedQuery(name = "UserView.fetchById", query = "SELECT c FROM UserView c WHERE c.id = :userId")
+        NamedQuery(name = "UserView.fetch", query = "SELECT c FROM UserView c WHERE c.name LIKE CONCAT(:usernameStartsWith, '%') ORDER BY c.name"),
+        NamedQuery(name = "UserView.fetchWhereIdIn", query = "SELECT c FROM UserView c WHERE c.id IN (:idsList) ORDER BY c.name"),
+        NamedQuery(name = "UserView.fetchById", query = "SELECT c FROM UserView c WHERE c.id = :userId"),
+        NamedQuery(name = "UserView.fetchByEmail", query = "SELECT c FROM UserView c WHERE c.email = :email"),
+        NamedQuery(name = "UserView.existsByEmail", query = "SELECT COUNT(c) FROM UserView c WHERE c.email = :email")
 )
 data class UserView(
         @Id var id: String,
-        var username: String,
+        var name: String,
         var email: String,
+        var passwordHash: String,
         var avatar: String
 ) {
-    constructor() : this("", "", "", "")
+    constructor() : this("", "", "", "", "")
 }
 
 @Entity

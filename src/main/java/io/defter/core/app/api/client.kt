@@ -16,6 +16,7 @@ data class CountExpenseGroupViewsResponse(val count: Int, val lastEvent: Long)
  */
 data class UserViewFilter(val usernameStartsWith: String = "")
 data class FetchUserViewsQuery(val offset: Int, val limit: Int, val filter: UserViewFilter)
+data class FetchUserViewByEmail(val email: String)
 data class FetchUserViewById(val id: String)
 data class FetchUserViewsByIds(val ids: List<String>)
 

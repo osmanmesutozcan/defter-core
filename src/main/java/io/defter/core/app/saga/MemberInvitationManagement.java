@@ -1,9 +1,9 @@
 package io.defter.core.app.saga;
 
-import io.defter.core.app.api.AcceptAffiliationRequest;
-import io.defter.core.app.api.AffiliationRequestAnswered;
-import io.defter.core.app.api.AffiliationRequestSent;
-import io.defter.core.app.api.RejectAffiliationRequest;
+import io.defter.core.app.api.AcceptMemberInvitation;
+import io.defter.core.app.api.MemberInvitationAnswered;
+import io.defter.core.app.api.MemberInvitationSent;
+import io.defter.core.app.api.RejectMemberInvitation;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -17,65 +17,61 @@ import org.axonframework.spring.stereotype.Saga;
 @Saga
 @XSlf4j
 @RequiredArgsConstructor
-public class MemberAffiliationManagement {
+public class MemberInvitationManagement {
 
   private transient CommandGateway commandGateway;
   private transient EntityManager entityManager;
-  private AffiliationRequestState requestState = AffiliationRequestState.NOT_SENT;
+  private InvitationRequestState requestState = InvitationRequestState.NOT_SENT;
 
   // We will keep track of users info internally in saga so
   // we don't expose any user id to invitation process.
-  private String userId;
-  private String affiliatingUserId;
+  private String invitedUserId;
 
   @StartSaga
-  @SagaEventHandler(associationProperty = "affiliationRequestId")
-  public void handle(AffiliationRequestSent event) {
+  @SagaEventHandler(associationProperty = "invitationRequestId")
+  public void handle(MemberInvitationSent event) {
     log.debug("saga handling {}", event);
 
-    if (requestState.equals(AffiliationRequestState.SENT)) {
+    if (requestState.equals(InvitationRequestState.SENT)) {
       // This might be a retry attempt. We will ignore this
       return;
     }
 
     // send the email
 
-    requestState = AffiliationRequestState.SENT;
+    requestState = InvitationRequestState.SENT;
     String emailId = UUID.randomUUID().toString();
     SagaLifecycle.associateWith("emailId", emailId);
 
-    this.userId = event.getUserId();
-    this.affiliatingUserId = event.getAffiliatingUserId();
+    this.invitedUserId = event.getInvitedUserId();
 
     log.debug("Sending an invitation email {} {}", emailId, event);
   }
 
   @SagaEventHandler(associationProperty = "emailId")
-  public void handle(AffiliationRequestAnswered event) {
+  public void handle(MemberInvitationAnswered event) {
     log.debug("Invitation answered {}", event);
 
-    if (!requestState.equals(AffiliationRequestState.SENT)) {
+    if (!requestState.equals(InvitationRequestState.SENT)) {
       // Not sure how to handle this...
       return;
     }
 
-    if (event.getAnswer().equals(AffiliationAnswer.ACCEPTED)) {
+    if (event.getAnswer().equals(InvitationAnswer.ACCEPTED)) {
       commandGateway.send(
-          new AcceptAffiliationRequest(
-              this.userId,
-              this.affiliatingUserId,
-              event.getAffiliationRequestId(),
+          new AcceptMemberInvitation(
+              this.invitedUserId,
+              event.getInvitationRequestId(),
               event.getEmailId()
           )
       );
     }
 
-    if (event.getAnswer().equals(AffiliationAnswer.REJECTED)) {
+    if (event.getAnswer().equals(InvitationAnswer.REJECTED)) {
       commandGateway.send(
-          new RejectAffiliationRequest(
-              this.userId,
-              this.affiliatingUserId,
-              event.getAffiliationRequestId(),
+          new RejectMemberInvitation(
+              this.invitedUserId,
+              event.getInvitationRequestId(),
               event.getEmailId()
           )
       );
@@ -84,12 +80,12 @@ public class MemberAffiliationManagement {
     SagaLifecycle.end();
   }
 
-  public enum AffiliationRequestState {
+  public enum InvitationRequestState {
     NOT_SENT,
     SENT,
   }
 
-  public enum AffiliationAnswer {
+  public enum InvitationAnswer {
     ACCEPTED,
     REJECTED,
   }
