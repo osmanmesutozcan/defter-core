@@ -2,6 +2,7 @@ package io.defter.core.app.client;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import graphql.GraphQLException;
+import graphql.schema.DataFetchingEnvironment;
 import io.defter.core.app.api.*;
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement.InvitationAnswer;
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import javax.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -18,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@XSlf4j
 @Component
 @RequiredArgsConstructor
 public class Mutation implements GraphQLMutationResolver {
@@ -26,7 +29,9 @@ public class Mutation implements GraphQLMutationResolver {
   private final CommandGateway commandGateway;
   private final EntityManager entityManager;
 
-  public String createUser(String name, String email, String password) {
+  public String createUser(String name, String email, String password, DataFetchingEnvironment environment) {
+    log.debug("env {}", environment);
+
     String id = UUID.randomUUID().toString();
     CreateUser command = new CreateUser(id, name, email, password);
 

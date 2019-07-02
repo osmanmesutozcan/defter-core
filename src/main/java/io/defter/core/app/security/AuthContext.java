@@ -1,4 +1,4 @@
-package io.defter.core.app.client;
+package io.defter.core.app.security;
 
 import graphql.servlet.GraphQLContext;
 import io.defter.core.app.api.UserView;
