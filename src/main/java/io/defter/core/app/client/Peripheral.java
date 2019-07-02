@@ -22,7 +22,7 @@ public class Peripheral {
    */
   @GetMapping("/invitation/reference")
   public void invitationAnswer(
-      @RequestParam("iid") String affiliationRequestId,
+      @RequestParam("iid") String invitationRequestId,
       @RequestParam("eid") String emailId
   ) {
     //

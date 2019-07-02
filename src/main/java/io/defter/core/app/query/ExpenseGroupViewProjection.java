@@ -21,7 +21,7 @@ import java.util.UUID;
 @Component
 @Profile("query")
 @RequiredArgsConstructor
-@ProcessingGroup(QueryConstants.EXPENSE_GROUP_PROCCESSOR)
+@ProcessingGroup(QueryConstants.EXPENSE_GROUP_PROCESSOR)
 public class ExpenseGroupViewProjection {
 
   private final EntityManager entityManager;

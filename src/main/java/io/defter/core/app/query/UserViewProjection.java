@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 @Profile("query")
 @RequiredArgsConstructor
-@ProcessingGroup(QueryConstants.USER_PROCCESSOR)
+@ProcessingGroup(QueryConstants.USER_PROCESSOR)
 public class UserViewProjection {
 
   private final EntityManager entityManager;
