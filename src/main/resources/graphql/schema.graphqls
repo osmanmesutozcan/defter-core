@@ -6,8 +6,8 @@ type Query {
 }
 
 type Mutation {
-    createUser(username: String!): String!
-    createGroup(name: String! currency: String! members: [String]!): String!
+    createUser(username: String!, email: String!): String!
+    createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
     addSplitToGroup(groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!): String!
 }
 
@@ -17,6 +17,11 @@ input SplitMemberInput {
     share: Float!
 }
 
+input GroupMemberInput {
+    id: String!
+    email: String!
+}
+
 type Group {
     id: String!
     name: String!
@@ -24,11 +29,17 @@ type Group {
     #    updateAt: String!
     balance: Float!
     numberOfSplits: Int!
-    members: [Member]!
+    members: [GroupMember]!
+}
+
+type GroupMember {
+    id: String!
+    email: String!
 }
 
 type Member {
     id: String!
+    email: String!
     username: String!
     avatar: String!
 }

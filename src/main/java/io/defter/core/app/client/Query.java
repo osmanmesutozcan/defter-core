@@ -17,6 +17,7 @@ import java.util.List;
 public class Query implements GraphQLQueryResolver {
 
   private final QueryGateway queryGateway;
+  private final String currentUserId =  "6efa72f0-ca93-4484-9c1d-5785dc0aba7a";
 
   public List<ExpenseGroupView> groups() {
     FetchExpenseGroupViewsQuery query = new FetchExpenseGroupViewsQuery(0, 10, new ExpenseGroupViewFilter(""));
@@ -26,7 +27,7 @@ public class Query implements GraphQLQueryResolver {
   }
 
   public List<UserView> affiliations() {
-    FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery("f2057425-c9cf-45e9-937f-7e32649ac5f8");
+    FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery(currentUserId);
     return queryGateway
         .query(query, ResponseTypes.multipleInstancesOf(UserView.class))
         .join();
@@ -41,7 +42,7 @@ public class Query implements GraphQLQueryResolver {
 
   public SettlementResult settlement(String groupId) {
     FetchExpenseGroupSettlementQuery query = new FetchExpenseGroupSettlementQuery(
-        "11871356-8a09-4f20-9ab6-f9a19ca219ed", groupId);
+        currentUserId, groupId);
 
     SettlementView settlement = queryGateway
         .query(query, ResponseTypes.instanceOf(SettlementView.class))

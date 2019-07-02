@@ -1,7 +1,9 @@
 package io.defter.core.app.api
 
+import io.defter.core.app.saga.MemberAffiliationManagement
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 import java.util.*
+import javax.validation.constraints.Email
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
@@ -11,36 +13,88 @@ import javax.validation.constraints.Size
  */
 data class CreateUser(
         @TargetAggregateIdentifier val id: String,
-        @NotNull @Size(min = 5) val username: String
+        @NotNull @Size(min = 5) val username: String,
+        @NotNull @Email val email: String
 )
 
 data class UserCreated(
         val id: String,
-        val username: String
+        val username: String,
+        val email: String
+)
+
+/**
+ * Affiliation
+ */
+data class SendAffiliationRequest(
+        @TargetAggregateIdentifier val userId: String,
+        @NotNull val affiliatingUserId: String,
+        @NotNull val affiliationRequestId: String
+)
+
+data class AffiliationRequestSent(
+        val userId: String,
+        val affiliatingUserId: String,
+        val affiliationRequestId: String
+)
+
+data class AnswerAffiliationRequest(
+        @TargetAggregateIdentifier val affiliationRequestId: String,
+        @NotNull val emailId: String,
+        @NotNull val answer: MemberAffiliationManagement.AffiliationAnswer
+)
+
+data class AffiliationRequestAnswered(
+        val affiliationRequestId: String,
+        val emailId: String,
+        val answer: MemberAffiliationManagement.AffiliationAnswer
+)
+
+data class AcceptAffiliationRequest(
+        @TargetAggregateIdentifier val userId: String,
+        @NotNull val affiliatingUserId: String,
+        @NotNull val affiliationRequestId: String,
+        @NotNull val emailId: String
+)
+
+data class AffiliationRequestAccepted(
+        val userId: String,
+        val affiliatingUserId: String,
+        val affiliationRequestId: String,
+        val emailId: String
+)
+
+data class RejectAffiliationRequest(
+        @TargetAggregateIdentifier val userId: String,
+        @NotNull val affiliatingUserId: String,
+        @NotNull val affiliationRequestId: String,
+        @NotNull val emailId: String
+)
+
+data class AffiliationRequestRejected(
+        val userId: String,
+        val affiliatingUserId: String,
+        val affiliationRequestId: String,
+        val emailId: String
 )
 
 data class CreateExpenseGroup(
         @TargetAggregateIdentifier val id: String,
         @NotNull @Size(min = 5) val name: String,
         val currency: Currency,
-        val members: List<String>
+        val members: List<ExpenseGroupMember>
 )
 
 data class ExpenseGroupCreated(
         val id: String,
         val name: String,
         val currency: Currency,
-        val members: List<String>
-)
-
-data class InviteMemberToGroup(
-        @TargetAggregateIdentifier val id: String,
-        val memberId: String
+        val members: List<ExpenseGroupMember>
 )
 
 data class MemberAddedToGroup(
         @TargetAggregateIdentifier val id: String,
-        val memberId: String
+        val member: ExpenseGroupMember
 )
 
 data class AddSplitToGroup(

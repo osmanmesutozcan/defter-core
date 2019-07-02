@@ -27,41 +27,26 @@ public class UserViewProjection {
   @EventHandler
   public void on(UserCreated event) {
     log.debug("projecting {}", event);
-    entityManager.persist(new UserView(event.getId(), event.getUsername(), ""));
+    entityManager.persist(new UserView(event.getId(), event.getUsername(), event.getEmail(), "https://api.adorable.io/avatars/" + event.getUsername()));
   }
 
-  @EventHandler
-  public void on(ExpenseGroupCreated event) {
-    log.debug("projecting {}", event);
-
-    List<String> members = event.getMembers();
-    members.forEach(member -> {
-      List<String> friends = members
-          .stream()
-          .filter(m -> !member.contains(m))
-          .collect(Collectors.toList());
-
-      friends.forEach(friend -> saveAffiliation(member, friend));
-    });
-  }
-
-  private void saveAffiliation(String member, String friend) {
-    // Here we cannot use class level entityManager because we want to catch the
-    // unique contraint error.
-    String id = UUID.randomUUID().toString();
-
-    TypedQuery<Long> jpaQuery = entityManager
-        .createNamedQuery("UserAffiliateView.exists", Long.class);
-    jpaQuery.setParameter("userId", member);
-    jpaQuery.setParameter("friendId", friend);
-
-    if (jpaQuery.getSingleResult().intValue() > 0) {
-      log.warn("skipped affiliate relation from {} to {}", member, friend);
-      return;
-    }
-
-    entityManager.persist(new UserAffiliateView(id, member, friend));
-  }
+//  private void saveAffiliation(String member, String friend) {
+//    // Here we cannot use class level entityManager because we want to catch the
+//    // unique constraint error.
+//    String id = UUID.randomUUID().toString();
+//
+//    TypedQuery<Long> jpaQuery = entityManager
+//        .createNamedQuery("UserAffiliateView.exists", Long.class);
+//    jpaQuery.setParameter("userId", member);
+//    jpaQuery.setParameter("friendId", friend);
+//
+//    if (jpaQuery.getSingleResult().intValue() > 0) {
+//      log.warn("skipped affiliate relation from {} to {}", member, friend);
+//      return;
+//    }
+//
+//    entityManager.persist(new UserAffiliateView(id, member, friend));
+//  }
 
   @QueryHandler
   public List<UserView> handle(FetchUserViewsQuery query) {
@@ -90,15 +75,6 @@ public class UserViewProjection {
         .createNamedQuery("UserView.fetchById", UserView.class);
     jpaQuery.setParameter("userId", query.getId());
     return log.exit(jpaQuery.getSingleResult());
-  }
-
-  @QueryHandler
-  public List<SplitView> handle(FetchExpenseGroupsSplitsQuery query) {
-    log.trace("handling {}", query);
-    TypedQuery<SplitView> jpaQuery = entityManager
-        .createNamedQuery("SplitView.fetch", SplitView.class);
-    jpaQuery.setParameter("groupId", query.getGroupId());
-    return log.exit(jpaQuery.getResultList());
   }
 
   @QueryHandler

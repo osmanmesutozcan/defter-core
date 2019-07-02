@@ -1,6 +1,9 @@
 package io.defter.core.app.command;
 
 import io.defter.core.app.api.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -13,16 +16,12 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @XSlf4j
 @Aggregate
 @Profile("command")
+@NoArgsConstructor
 public class ExpenseGroup {
 
   @AggregateIdentifier
   private String id;
-  private String name;
-  private Currency currency;
-
-  public ExpenseGroup() {
-    //
-  }
+  private List<ExpenseGroupMember> members;
 
   @CommandHandler
   public ExpenseGroup(CreateExpenseGroup command) {
@@ -37,6 +36,24 @@ public class ExpenseGroup {
   @CommandHandler
   public void handle(AddSplitToGroup cmd) {
     log.debug("handling {}", cmd);
+
+    List<String> memberIds = cmd
+        .getMembers()
+        .stream()
+        .map(SplitMember::getId)
+        .collect(Collectors.toList());
+
+    memberIds.add(cmd.getSubmittedBy());
+    memberIds.add(cmd.getPayedBy());
+
+    List<String> groupMemberIds = members
+        .stream()
+        .map(ExpenseGroupMember::getId)
+        .collect(Collectors.toList());
+
+    if (!groupMemberIds.containsAll(memberIds)) {
+      throw new IllegalStateException("Split contains a member who is not part of this group");
+    }
     apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(),
         cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
   }
@@ -44,7 +61,6 @@ public class ExpenseGroup {
   @EventSourcingHandler
   public void on(ExpenseGroupCreated event) {
     id = event.getId();
-    name = event.getName();
-    currency = event.getCurrency();
+    members = event.getMembers();
   }
 }

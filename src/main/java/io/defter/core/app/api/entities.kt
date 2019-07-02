@@ -19,9 +19,10 @@ enum class Currency {
 data class UserView(
         @Id var id: String,
         var username: String,
+        var email: String,
         var avatar: String
 ) {
-    constructor() : this("", "", "")
+    constructor() : this("", "", "", "")
 }
 
 @Entity
@@ -49,9 +50,14 @@ data class ExpenseGroupView(
         var currency: Currency, // TODO: Enum this.
         var balance: Double,
         var numberOfSplits: Int,
-        @ElementCollection(targetClass = String::class) var members: List<String>
+        @ElementCollection var members: List<ExpenseGroupMember>
 ) {
-    constructor() : this("", "", Currency.USD, .0, 0, ArrayList<String>())
+    constructor() : this("", "", Currency.USD, .0, 0, ArrayList<ExpenseGroupMember>())
+}
+
+@Embeddable
+data class ExpenseGroupMember(val id: String, val email: String) {
+    constructor() : this("", "")
 }
 
 @Entity

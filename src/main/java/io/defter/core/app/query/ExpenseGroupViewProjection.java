@@ -43,8 +43,8 @@ public class ExpenseGroupViewProjection {
   public void on(MemberAddedToGroup event) {
     log.debug("projecting {}", event);
     ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getId());
-    List<String> members = group.getMembers();
-    members.add(event.getMemberId());
+    List<ExpenseGroupMember> members = group.getMembers();
+    members.add(event.getMember());
     group.setMembers(members);
   }
 
@@ -72,6 +72,15 @@ public class ExpenseGroupViewProjection {
     jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
     jpaQuery.setFirstResult(query.getOffset());
     jpaQuery.setMaxResults(query.getLimit());
+    return log.exit(jpaQuery.getResultList());
+  }
+
+  @QueryHandler
+  public List<SplitView> handle(FetchExpenseGroupsSplitsQuery query) {
+    log.trace("handling {}", query);
+    TypedQuery<SplitView> jpaQuery = entityManager
+        .createNamedQuery("SplitView.fetch", SplitView.class);
+    jpaQuery.setParameter("groupId", query.getGroupId());
     return log.exit(jpaQuery.getResultList());
   }
 

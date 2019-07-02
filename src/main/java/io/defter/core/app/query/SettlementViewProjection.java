@@ -38,15 +38,15 @@ public class SettlementViewProjection {
     settlements.forEach(entityManager::persist);
   }
 
-  private SettlementView createSettlementViewForMember(List<String> members, String currentMember, String groupId) {
+  private SettlementView createSettlementViewForMember(List<ExpenseGroupMember> members, ExpenseGroupMember currentMember, String groupId) {
     List<SettlementBalance> balances = members
         .stream()
-        .filter(m -> !m.equals(currentMember))
-        .map(m -> new SettlementBalance(m, 0))
+        .filter(m -> !m.getId().equals(currentMember.getId()))
+        .map(m -> new SettlementBalance(m.getId(), 0))
         .collect(Collectors.toList());
 
     String id = UUID.randomUUID().toString();
-    return new SettlementView(id, currentMember, groupId, new Date(), balances);
+    return new SettlementView(id, currentMember.getId(), groupId, new Date(), balances);
   }
 
   @EventHandler
@@ -84,7 +84,7 @@ public class SettlementViewProjection {
     if (payedBy.equals(settlement.getUserId())) {
       SplitMember member = members.get(settlement.getUserId());
       double amount = event.getAmount() * (member.getShare() / 100);
-      return new SettlementBalance(member.getId(), balance.getBalance() - amount);
+      balance.setBalance(balance.getBalance() - amount);
     }
 
     // if this is other users settlement record
@@ -92,10 +92,9 @@ public class SettlementViewProjection {
     if (payedBy.equals(balance.getUserId())) {
       SplitMember member = members.get(balance.getUserId());
       double amount = event.getAmount() * (member.getShare() / 100);
-      return new SettlementBalance(member.getId(), balance.getBalance() + amount);
+      balance.setBalance(balance.getBalance() + amount);
     }
 
-    // Should never fall here.
     return balance;
   }
 

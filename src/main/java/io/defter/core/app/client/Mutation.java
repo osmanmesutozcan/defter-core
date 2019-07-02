@@ -16,13 +16,13 @@ public class Mutation implements GraphQLMutationResolver {
 
   private final CommandGateway commandGateway;
 
-  public String createUser(String name) {
+  public String createUser(String name, String email) {
     String id = UUID.randomUUID().toString();
-    CreateUser command = new CreateUser(id, name);
+    CreateUser command = new CreateUser(id, name, email);
     return commandGateway.sendAndWait(command);
   }
 
-  public String createGroup(String name, Currency currency, List<String> members) {
+  public String createGroup(String name, Currency currency, List<ExpenseGroupMember> members) {
     String id = UUID.randomUUID().toString();
     CreateExpenseGroup command = new CreateExpenseGroup(id, name, currency, members);
     return commandGateway.sendAndWait(command);

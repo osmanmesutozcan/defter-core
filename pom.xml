@@ -41,6 +41,13 @@
       <version>${axon.version}</version>
     </dependency>
 
+    <!-- Inject resources into saga -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>1</version>
+    </dependency>
+
     <!-- Vanilla Spring Boot to start with -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
