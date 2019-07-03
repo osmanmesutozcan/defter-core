@@ -6,6 +6,7 @@ type Query {
 }
 
 type Mutation {
+    logout: Boolean!
     login(email: String!, password: String!): AuthPayload!
     createUser(name: String!, email: String!, password: String!): String!
     createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
