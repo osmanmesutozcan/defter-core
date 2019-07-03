@@ -14,6 +14,8 @@ import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 
+// Setup a deadline for this. if invitation is not
+// replied within a certain time, we could ping the user again.
 @Saga
 @XSlf4j
 @RequiredArgsConstructor

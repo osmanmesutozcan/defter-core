@@ -44,6 +44,8 @@ public class ExpenseGroupInvitationManagement {
 
     List<ExpenseGroupMember> members = event.getMembers();
     // TODO: Check who created the group and automatically accept group invitation for that user.
+    //
+    //
     members.forEach(member -> sendInvitation(member.getId(), event.getId()));
     requestState = InvitationRequestState.SENT;
   }

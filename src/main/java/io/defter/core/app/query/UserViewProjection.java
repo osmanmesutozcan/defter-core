@@ -1,6 +1,7 @@
 package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.config.ProcessingGroup;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @XSlf4j
 @Component
@@ -29,34 +28,6 @@ public class UserViewProjection {
     log.debug("projecting {}", event);
     entityManager.persist(new UserView(event.getId(), event.getName(), event.getEmail(), event.getPasswordHash(),
         "https://api.adorable.io/avatars/" + event.getName()));
-  }
-
-  @EventHandler
-  public void on(ExpenseGroupInvitationAccepted event) {
-    log.debug("projecting {}", event);
-    ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getGroupId());
-    List<ExpenseGroupMember> members = group.getMembers();
-
-    members
-        .stream()
-        .filter(m -> !m.getId().equals(event.getInvitedUserId()))
-        .forEach(m -> saveAffiliation(m.getId(), event.getInvitedUserId()));
-  }
-
-  private void saveAffiliation(String member, String friend) {
-    String id = UUID.randomUUID().toString();
-
-    TypedQuery<Long> jpaQuery = entityManager
-        .createNamedQuery("UserAffiliateView.exists", Long.class);
-    jpaQuery.setParameter("userId", member);
-    jpaQuery.setParameter("friendId", friend);
-
-    if (jpaQuery.getSingleResult().intValue() > 0) {
-      log.warn("skipped affiliate relation from {} to {}", member, friend);
-      return;
-    }
-
-    entityManager.persist(new UserAffiliateView(id, member, friend));
   }
 
   @QueryHandler

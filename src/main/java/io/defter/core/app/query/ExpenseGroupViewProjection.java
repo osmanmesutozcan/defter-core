@@ -2,6 +2,7 @@ package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
 import io.defter.core.app.api.ExpenseGroupCreated;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.config.ProcessingGroup;
@@ -46,6 +47,39 @@ public class ExpenseGroupViewProjection {
     List<ExpenseGroupMember> members = group.getMembers();
     members.add(event.getMember());
     group.setMembers(members);
+  }
+
+  @EventHandler
+  public void on(ExpenseGroupInvitationAccepted event) {
+    log.debug("projecting {}", event);
+    ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getGroupId());
+
+    List<String> friends = group
+        .getMembers()
+        .stream()
+        .map(ExpenseGroupMember::getId)
+        .filter(m -> !m.equals(event.getInvitedUserId()))
+        .collect(Collectors.toList());
+
+    friends.forEach(friend -> saveAffiliation(event.getInvitedUserId(), friend));
+  }
+
+  private void saveAffiliation(String member, String friend) {
+    // Here we cannot use class level entityManager because we want to catch the
+    // unique contraint error.
+    String id = UUID.randomUUID().toString();
+
+    TypedQuery<Long> jpaQuery = entityManager
+        .createNamedQuery("UserAffiliateView.exists", Long.class);
+    jpaQuery.setParameter("userId", member);
+    jpaQuery.setParameter("friendId", friend);
+
+    if (jpaQuery.getSingleResult().intValue() > 0) {
+      log.warn("skipped affiliate relation from {} to {}", member, friend);
+      return;
+    }
+
+    entityManager.persist(new UserAffiliateView(id, member, friend));
   }
 
   @EventHandler
