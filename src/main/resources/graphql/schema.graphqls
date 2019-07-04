@@ -12,7 +12,15 @@ type Mutation {
     createUser(name: String!, email: String!, password: String!): String!
     createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
     answerToGroupInvitation(invitationId: String, answer: InvitationAnswer): String!
-    addSplitToGroup(groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!): String!
+
+    addSplitToGroup(
+        groupId: String!
+        payedBy: String!
+        total: Int!
+        description: String!
+        currency: Currency
+        members: [SplitMemberInput]!
+    ): String!
 }
 
 input SplitMemberInput {
@@ -31,10 +39,17 @@ enum InvitationAnswer {
     REJECTED
 }
 
+enum Currency {
+    USD
+    TRY
+    EURO
+}
+
 type Invitation {
   id: String!
   answer: InvitationAnswer
 }
+
 
 # TODO: Return current user
 type AuthPayload {

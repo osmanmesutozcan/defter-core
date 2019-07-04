@@ -47,7 +47,7 @@ data class UserAffiliateView(
 
 @Entity
 @NamedQueries(
-        NamedQuery(name = "ExpenseGroupView.fetch", query = "SELECT c FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.updatedAt ASC"),
+        NamedQuery(name = "ExpenseGroupView.fetch", query = "SELECT c FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.updatedAt DESC"),
         NamedQuery(name = "ExpenseGroupView.count", query = "SELECT COUNT(c) FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%')")
 )
 data class ExpenseGroupView(
@@ -89,10 +89,11 @@ data class SplitView(
         var description: String,
         var payedBy: String,
         var submittedBy: String,
-        var createdAt: Date,
+        var createdAt: Date, // client provided date to make sure we know the origin time.
+        var currency: Currency,
         @ElementCollection var members: List<SplitMember>
 ) {
-    constructor() : this("", .0, "", "", "", "", Date(), ArrayList<SplitMember>())
+    constructor() : this("", .0, "", "", "", "", Date(), Currency.USD, ArrayList<SplitMember>())
 }
 
 @Embeddable
@@ -113,6 +114,11 @@ data class SettlementView(
         @ElementCollection var balances: List<SettlementBalance>
 ) {
     constructor() : this("", "", "", Date(), ArrayList<SettlementBalance>())
+
+    @PrePersist
+    fun createdAt() {
+        this.createdAt = Date()
+    }
 }
 
 @Embeddable

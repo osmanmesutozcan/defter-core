@@ -5,6 +5,7 @@ import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.servlet.GraphQLContext;
 import io.defter.core.app.api.*;
+import io.defter.core.app.core.CustomConfigurationProperties;
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement.InvitationAnswer;
 import io.defter.core.app.security.Unsecured;
 import javax.persistence.EntityManager;
@@ -111,16 +112,17 @@ public class Mutation implements GraphQLMutationResolver {
       String payedBy,
       Double total,
       String description,
+      Currency currency,
       List<SplitMember> members
   ) {
 
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     String currentUserId = ((UserView) principal).getId();
-
     Date createdAt = new Date();
+
     AddSplitToGroup command = new AddSplitToGroup(
         groupId, total, payedBy, description,
-        currentUserId, createdAt, members
+        currentUserId, createdAt, members, currency
     );
 
     commandGateway.sendAndWait(command);

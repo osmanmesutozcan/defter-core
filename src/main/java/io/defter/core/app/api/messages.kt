@@ -158,7 +158,8 @@ data class AddSplitToGroup(
         val description: String,
         val submittedBy: String,
         val createdAt: Date,
-        val members: List<SplitMember>
+        val members: List<SplitMember>,
+        val currency: Currency
 )
 
 data class SplitAddedToGroup(
@@ -168,5 +169,17 @@ data class SplitAddedToGroup(
         val description: String,
         val submittedBy: String,
         val createdAt: Date,
-        val members: List<SplitMember>
+        val members: List<SplitMember>,
+        val currency: Currency
 )
+
+// PERIPHERAL EVENTS
+
+data class ScheduledElapsed(
+        val description: String,
+        val type: ScheduledEventTypes
+)
+
+enum class ScheduledEventTypes {
+    EXCHANGE_RATES_UPDATES
+}

@@ -90,7 +90,7 @@ public class ExpenseGroup {
     }
 
     apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(),
-        cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
+        cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers(), cmd.getCurrency()));
   }
 
   @CommandHandler
