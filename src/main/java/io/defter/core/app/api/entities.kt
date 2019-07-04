@@ -46,7 +46,7 @@ data class UserAffiliateView(
 
 @Entity
 @NamedQueries(
-        NamedQuery(name = "ExpenseGroupView.fetch", query = "SELECT c FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.id"),
+        NamedQuery(name = "ExpenseGroupView.fetch", query = "SELECT c FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%') ORDER BY c.updatedAt ASC"),
         NamedQuery(name = "ExpenseGroupView.count", query = "SELECT COUNT(c) FROM ExpenseGroupView c WHERE c.id LIKE CONCAT(:idStartsWith, '%')")
 )
 data class ExpenseGroupView(
@@ -55,9 +55,20 @@ data class ExpenseGroupView(
         var currency: Currency, // TODO: Enum this.
         var balance: Double,
         var numberOfSplits: Int,
+        var updatedAt: Date,
         @ElementCollection var members: List<ExpenseGroupMember>
 ) {
-    constructor() : this("", "", Currency.USD, .0, 0, ArrayList<ExpenseGroupMember>())
+    constructor() : this("", "", Currency.USD, .0, 0, Date(), ArrayList<ExpenseGroupMember>())
+
+    @PreUpdate
+    fun updatedAt() {
+        this.updatedAt = Date()
+    }
+
+    @PrePersist
+    fun createdAt() {
+        this.updatedAt = Date()
+    }
 }
 
 @Embeddable

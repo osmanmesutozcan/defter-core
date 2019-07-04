@@ -2,6 +2,7 @@ package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
 import io.defter.core.app.api.ExpenseGroupCreated;
+import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
@@ -36,6 +37,7 @@ public class ExpenseGroupViewProjection {
         event.getCurrency(),
         .0,
         0,
+        new Date(),
         new ArrayList<>()
     ));
   }
