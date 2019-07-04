@@ -34,10 +34,11 @@ public class UserViewProjection {
   public List<UserView> handle(FetchUserViewsQuery query) {
     log.trace("handling {}", query);
     TypedQuery<UserView> jpaQuery = entityManager
-        .createNamedQuery("UserView.fetch", UserView.class);
-    jpaQuery.setParameter("usernameStartsWith", query.getFilter().getUsernameStartsWith());
-    jpaQuery.setFirstResult(query.getOffset());
-    jpaQuery.setMaxResults(query.getLimit());
+        .createNamedQuery("UserView.fetch", UserView.class)
+        .setParameter("usernameStartsWith", query.getFilter().getUsernameStartsWith())
+        .setFirstResult(query.getOffset())
+        .setMaxResults(query.getLimit());
+
     return log.exit(jpaQuery.getResultList());
   }
 
@@ -45,8 +46,9 @@ public class UserViewProjection {
   public List<UserView> handle(FetchUserViewsByIds query) {
     log.trace("handling {}", query);
     TypedQuery<UserView> jpaQuery = entityManager
-        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
-    jpaQuery.setParameter("idsList", query.getIds());
+        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class)
+        .setParameter("idsList", query.getIds());
+
     return log.exit(jpaQuery.getResultList());
   }
 
@@ -54,8 +56,9 @@ public class UserViewProjection {
   public UserView handle(FetchUserViewById query) {
     log.trace("handling {}", query);
     TypedQuery<UserView> jpaQuery = entityManager
-        .createNamedQuery("UserView.fetchById", UserView.class);
-    jpaQuery.setParameter("userId", query.getId());
+        .createNamedQuery("UserView.fetchById", UserView.class)
+        .setParameter("userId", query.getId());
+
     return log.exit(jpaQuery.getSingleResult());
   }
 
@@ -63,8 +66,8 @@ public class UserViewProjection {
   public UserView handle(FetchUserViewByEmail query) {
     log.trace("handling {}", query);
     TypedQuery<UserView> jpaQuery = entityManager
-        .createNamedQuery("UserView.fetchByEmail", UserView.class);
-    jpaQuery.setParameter("email", query.getEmail());
+        .createNamedQuery("UserView.fetchByEmail", UserView.class)
+        .setParameter("email", query.getEmail());
     return log.exit(jpaQuery.getSingleResult());
   }
 
@@ -72,8 +75,8 @@ public class UserViewProjection {
   public List<UserView> on(FetchUserAffiliatesQuery query) {
     log.trace("handling {}", query);
     TypedQuery<UserAffiliateView> affiliatesQuery = entityManager
-        .createNamedQuery("UserAffiliateView.fetchByUserId", UserAffiliateView.class);
-    affiliatesQuery.setParameter("userId", query.getUserId());
+        .createNamedQuery("UserAffiliateView.fetchByUserId", UserAffiliateView.class)
+        .setParameter("userId", query.getUserId());
 
     List<String> affiliates = affiliatesQuery.getResultList()
         .stream()
@@ -81,8 +84,8 @@ public class UserViewProjection {
         .collect(Collectors.toList());
 
     TypedQuery<UserView> usersQuery = entityManager
-        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class);
-    usersQuery.setParameter("idsList", affiliates);
+        .createNamedQuery("UserView.fetchWhereIdIn", UserView.class)
+        .setParameter("idsList", affiliates);
 
     return log.exit(usersQuery.getResultList());
   }

@@ -3,6 +3,7 @@ package io.defter.core.app.client;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import io.defter.core.app.api.*;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,7 @@ public class Query implements GraphQLQueryResolver {
   private final QueryGateway queryGateway;
 
   public List<ExpenseGroupView> groups() {
-    // TODO: Get groups of current user
+    // TODO: Get only groups of current user
     FetchExpenseGroupViewsQuery query = new FetchExpenseGroupViewsQuery(0, 50, new ExpenseGroupViewFilter(""));
     return queryGateway
         .query(query, ResponseTypes.multipleInstancesOf(ExpenseGroupView.class))
@@ -30,9 +31,7 @@ public class Query implements GraphQLQueryResolver {
   }
 
   public List<UserView> affiliations() {
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    String currentUserId = ((UserView) principal).getId();
-
+    String currentUserId = getCurrentUser().getId();
     FetchUserAffiliatesQuery query = new FetchUserAffiliatesQuery(currentUserId);
     return queryGateway
         .query(query, ResponseTypes.multipleInstancesOf(UserView.class))
@@ -47,9 +46,7 @@ public class Query implements GraphQLQueryResolver {
   }
 
   public SettlementResult settlement(String groupId) {
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    String currentUserId = ((UserView) principal).getId();
-
+    String currentUserId = getCurrentUser().getId();
     FetchExpenseGroupSettlementQuery query = new FetchExpenseGroupSettlementQuery(
         currentUserId, groupId);
 
@@ -60,8 +57,21 @@ public class Query implements GraphQLQueryResolver {
     return new SettlementResult(0, settlement.getBalances());
   }
 
-  @Getter
-  @Setter
+  public List<ExpenseGroupInvitationView> invitations() {
+    String currentUserId = getCurrentUser().getId();
+    FetchInvitationsOfUser query = new FetchInvitationsOfUser(currentUserId);
+
+    return queryGateway
+        .query(query, ResponseTypes.multipleInstancesOf(ExpenseGroupInvitationView.class))
+        .join();
+  }
+
+  private UserView getCurrentUser() {
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return ((UserView) principal);
+  }
+
+  @Data
   @AllArgsConstructor
   public class SettlementResult {
 

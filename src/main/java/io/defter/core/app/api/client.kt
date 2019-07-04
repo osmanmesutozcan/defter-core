@@ -34,3 +34,8 @@ data class FetchExpenseGroupsSplitsQuery(val groupId: String)
  * Settlement View
  */
 data class FetchExpenseGroupSettlementQuery(val userId: String, val groupId: String)
+
+/**
+ * Invitation
+ */
+data class FetchInvitationsOfUser(val userId: String)

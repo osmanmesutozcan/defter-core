@@ -1,7 +1,9 @@
 package io.defter.core.app.api
 
+import io.defter.core.app.saga.ExpenseGroupInvitationManagement
 import lombok.Data
 import java.util.*
+import javax.annotation.Nullable
 import javax.persistence.*
 import kotlin.collections.ArrayList
 
@@ -116,4 +118,23 @@ data class SettlementView(
 @Embeddable
 data class SettlementBalance(var userId: String, var balance: Double) {
     constructor() : this("", .0)
+}
+
+@Entity
+@NamedQueries(
+        NamedQuery(name = "ExpenseGroupInvitationView.fetch", query = "SELECT c FROM ExpenseGroupInvitationView c WHERE c.invitedUserId = :userId")
+)
+data class ExpenseGroupInvitationView(
+        @Id var id: String,
+        var invitedUserId: String,
+        var expenseGroupId: String,
+        @Column(nullable = true) var answer: ExpenseGroupInvitationManagement.InvitationAnswer?,
+        var createdAt: Date
+) {
+    constructor() : this("", "", "", null, Date())
+
+    @PrePersist
+    fun createdAt() {
+        this.createdAt = Date()
+    }
 }

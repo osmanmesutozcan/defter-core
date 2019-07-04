@@ -1,5 +1,6 @@
 type Query {
     groups: [Group]!
+    invitations: [Invitation]!
     affiliations: [Member]!
     splits(groupId: String!): [Split]!
     settlement(groupId: String!): Settlement!
@@ -10,7 +11,7 @@ type Mutation {
     login(email: String!, password: String!): AuthPayload!
     createUser(name: String!, email: String!, password: String!): String!
     createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
-    answerToGroupInvitation(invitationRequestId: String, answer: InvitationAnswer): String!
+    answerToGroupInvitation(invitationId: String, answer: InvitationAnswer): String!
     addSplitToGroup(groupId: String! payedBy: String! total: Int! description: String! members: [SplitMemberInput]!): String!
 }
 
@@ -28,6 +29,11 @@ input GroupMemberInput {
 enum InvitationAnswer {
     ACCEPTED
     REJECTED
+}
+
+type Invitation {
+  id: String!
+  answer: InvitationAnswer
 }
 
 # TODO: Return current user
