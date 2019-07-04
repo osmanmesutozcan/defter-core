@@ -3,7 +3,6 @@ package io.defter.core.app.api
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement
 import lombok.Data
 import java.util.*
-import javax.annotation.Nullable
 import javax.persistence.*
 import kotlin.collections.ArrayList
 
@@ -54,13 +53,14 @@ data class UserAffiliateView(
 data class ExpenseGroupView(
         @Id var id: String,
         var name: String,
-        var currency: Currency, // TODO: Enum this.
+        @Enumerated(EnumType.STRING) var currency: Currency, // TODO: Enum this.
         var balance: Double,
         var numberOfSplits: Int,
+        var createdBy: String,
         var updatedAt: Date,
         @ElementCollection var members: List<ExpenseGroupMember>
 ) {
-    constructor() : this("", "", Currency.USD, .0, 0, Date(), ArrayList<ExpenseGroupMember>())
+    constructor() : this("", "", Currency.USD, .0, 0, "", Date(), ArrayList<ExpenseGroupMember>())
 
     @PreUpdate
     fun updatedAt() {
@@ -96,8 +96,8 @@ data class SplitView(
 }
 
 @Embeddable
-data class SplitMember(var id: String, var locked: Boolean, var share: Float) {
-    constructor() : this("", true, 0f)
+data class SplitMember(var id: String, var locked: Boolean, var share: Double) {
+    constructor() : this("", true, .0)
 }
 
 @Entity
@@ -128,7 +128,7 @@ data class ExpenseGroupInvitationView(
         @Id var id: String,
         var invitedUserId: String,
         var expenseGroupId: String,
-        @Column(nullable = true) var answer: ExpenseGroupInvitationManagement.InvitationAnswer?,
+        @Column(nullable = true) @Enumerated(EnumType.STRING) var answer: ExpenseGroupInvitationManagement.InvitationAnswer?,
         var createdAt: Date
 ) {
     constructor() : this("", "", "", null, Date())

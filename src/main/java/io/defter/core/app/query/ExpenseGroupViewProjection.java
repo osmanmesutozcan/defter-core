@@ -37,6 +37,7 @@ public class ExpenseGroupViewProjection {
         event.getCurrency(),
         .0,
         0,
+        event.getCreatedBy(),
         new Date(),
         new ArrayList<>()
     ));

@@ -3,6 +3,7 @@ package io.defter.core.app.api
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement
 import io.defter.core.app.saga.MemberInvitationManagement
 import org.axonframework.modelling.command.TargetAggregateIdentifier
+import org.springframework.data.annotation.CreatedBy
 import java.util.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.Min
@@ -133,6 +134,7 @@ data class CreateExpenseGroup(
         @TargetAggregateIdentifier val id: String,
         @NotNull @Size(min = 5) val name: String,
         val currency: Currency,
+        val createdBy: String,
         val members: List<ExpenseGroupMember>
 )
 
@@ -140,6 +142,7 @@ data class ExpenseGroupCreated(
         val id: String,
         val name: String,
         val currency: Currency,
+        val createdBy: String,
         val members: List<ExpenseGroupMember>
 )
 

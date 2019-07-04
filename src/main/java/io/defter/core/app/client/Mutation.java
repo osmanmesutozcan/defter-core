@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -95,14 +94,13 @@ public class Mutation implements GraphQLMutationResolver {
 
   public String createGroup(String name, Currency currency, List<ExpenseGroupMember> members) {
     String id = UUID.randomUUID().toString();
-    CreateExpenseGroup command = new CreateExpenseGroup(id, name, currency, members);
+    String currentUserId = getCurrentUser().getId();
+    CreateExpenseGroup command = new CreateExpenseGroup(id, name, currency, currentUserId, members);
     return commandGateway.sendAndWait(command);
   }
 
   public String answerToGroupInvitation(String invitationRequestId, InvitationAnswer answer) {
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    String currentUserId = ((UserView) principal).getId();
-
+    String currentUserId = getCurrentUser().getId();
     AnswerExpenseGroupInvitation command = new AnswerExpenseGroupInvitation(invitationRequestId, currentUserId, answer);
     commandGateway.sendAndWait(command);
     return "DONE";
@@ -137,6 +135,11 @@ public class Mutation implements GraphQLMutationResolver {
     jpaQuery.setParameter("email", email);
 
     return jpaQuery.getSingleResult().intValue() > 0;
+  }
+
+  private UserView getCurrentUser() {
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return ((UserView) principal);
   }
 
   @Data

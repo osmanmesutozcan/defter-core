@@ -1,6 +1,7 @@
 package io.defter.core.app.command;
 
 import io.defter.core.app.api.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
@@ -30,13 +31,42 @@ public class ExpenseGroup {
       throw new IllegalStateException("Group needs at least 2 members");
     }
 
-    apply(new ExpenseGroupCreated(command.getId(), command.getName(), command.getCurrency(), command.getMembers()));
-    command.getMembers().forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
+    List<String> memberIds = command
+        .getMembers()
+        .stream()
+        .map(ExpenseGroupMember::getId)
+        .collect(Collectors.toList());
+
+    if (command.getMembers().size() != new HashSet<>(memberIds).size()) {
+      throw new IllegalStateException("Group contains duplicate members");
+    }
+
+    apply(new ExpenseGroupCreated(
+        command.getId(),
+        command.getName(),
+        command.getCurrency(),
+        command.getCreatedBy(),
+        command.getMembers()
+    ));
+
+    command
+        .getMembers()
+        .forEach(member -> apply(new MemberAddedToGroup(command.getId(), member)));
   }
 
   @CommandHandler
   public void handle(AddSplitToGroup cmd) {
     log.debug("handling {}", cmd);
+
+    Double sumOfShares = cmd
+        .getMembers()
+        .stream()
+        .map(SplitMember::getShare)
+        .reduce(.0, Double::sum);
+
+    if (Math.ceil(sumOfShares) != 100) {
+      throw new IllegalStateException("Total of split share is not correct");
+    }
 
     List<String> memberIds = cmd
         .getMembers()
@@ -55,7 +85,7 @@ public class ExpenseGroup {
     if (!groupMemberIds.contains(cmd.getPayedBy())) {
       throw new IllegalStateException("User needs to be a part of group to be able to pay a split");
     }
-    if (!groupMemberIds.containsAll(memberIds)) {
+    if (!memberIds.containsAll(groupMemberIds)) {
       throw new IllegalStateException("Split contains a member who is not part of this group");
     }
 

@@ -22,9 +22,11 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @Aggregate
 @NoArgsConstructor
 public class Invitation {
+
   @AggregateIdentifier
   private String invitationRequestId;
   private String invitedUserId;
+  private Boolean isRequestFulfilled = false;
 
   @CommandHandler
   public Invitation(SendMemberInvitation command) {
@@ -53,38 +55,55 @@ public class Invitation {
 
   @CommandHandler
   public void handle(AnswerMemberInvitation command) {
+    log.debug("handling {}", command);
+
+    if (isRequestFulfilled) {
+      throw new GraphQLException("This request is already answered");
+    }
+
     apply(
-      new MemberInvitationAnswered(
-          command.getInvitationRequestId(),
-          command.getEmailId(),
-          command.getAnswer()
-      )
+        new MemberInvitationAnswered(
+            command.getInvitationRequestId(),
+            command.getEmailId(),
+            command.getAnswer()
+        )
     );
   }
 
   @CommandHandler
   public void handle(AnswerExpenseGroupInvitation command) {
+    log.debug("handling {}", command);
+
+    if (isRequestFulfilled) {
+      throw new GraphQLException("This request is already answered");
+    }
+
     if (!command.getAnsweredUserId().equals(invitedUserId)) {
       throw new GraphQLException("Answering user does not match the invited user");
     }
 
     apply(
-      new ExpenseGroupInvitationAnswered(
-          command.getInvitationRequestId(),
-          command.getAnsweredUserId(),
-          command.getAnswer()
-      )
+        new ExpenseGroupInvitationAnswered(
+            command.getInvitationRequestId(),
+            command.getAnsweredUserId(),
+            command.getAnswer()
+        )
     );
   }
 
   @EventSourcingHandler
-  public void on(MemberInvitationSent event){
+  public void on(MemberInvitationSent event) {
     invitationRequestId = event.getInvitationRequestId();
   }
 
   @EventSourcingHandler
-  public void on(ExpenseGroupInvitationSent event){
+  public void on(ExpenseGroupInvitationSent event) {
     invitationRequestId = event.getInvitationRequestId();
     invitedUserId = event.getInvitedUserId();
+  }
+
+  @EventSourcingHandler
+  public void on(ExpenseGroupInvitationAnswered event) {
+    isRequestFulfilled = true;
   }
 }

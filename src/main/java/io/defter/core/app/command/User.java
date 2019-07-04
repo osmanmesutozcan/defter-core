@@ -6,8 +6,6 @@ import io.defter.core.app.api.MemberInvitationRejected;
 import io.defter.core.app.api.CreateUser;
 import io.defter.core.app.api.RejectMemberInvitation;
 import io.defter.core.app.api.UserCreated;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.CommandHandler;

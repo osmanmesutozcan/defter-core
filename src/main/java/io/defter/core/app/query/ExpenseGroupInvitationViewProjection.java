@@ -1,8 +1,11 @@
 package io.defter.core.app.query;
 
+import io.defter.core.app.api.ExpenseGroupInvitationAccepted;
+import io.defter.core.app.api.ExpenseGroupInvitationRejected;
 import io.defter.core.app.api.ExpenseGroupInvitationSent;
 import io.defter.core.app.api.ExpenseGroupInvitationView;
 import io.defter.core.app.api.FetchInvitationsOfUser;
+import io.defter.core.app.saga.ExpenseGroupInvitationManagement.InvitationAnswer;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -36,6 +39,20 @@ public class ExpenseGroupInvitationViewProjection {
         null,
         new Date()
     ));
+  }
+
+  @EventHandler
+  public void on(ExpenseGroupInvitationAccepted event) {
+    log.debug("projecting {}", event);
+    ExpenseGroupInvitationView view = entityManager.find(ExpenseGroupInvitationView.class, event.getInvitationRequestId());
+    view.setAnswer(InvitationAnswer.ACCEPTED);
+  }
+
+  @EventHandler
+  public void on(ExpenseGroupInvitationRejected event) {
+    log.debug("projecting {}", event);
+    ExpenseGroupInvitationView view = entityManager.find(ExpenseGroupInvitationView.class, event.getInvitationRequestId());
+    view.setAnswer(InvitationAnswer.REJECTED);
   }
 
   @QueryHandler
