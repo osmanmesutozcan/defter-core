@@ -141,6 +141,12 @@
       <artifactId>slf4j-ext</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+
     <!-- For Spring-boot, since Java 9-->
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>

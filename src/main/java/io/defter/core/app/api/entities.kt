@@ -7,9 +7,10 @@ import javax.persistence.*
 import kotlin.collections.ArrayList
 
 enum class Currency {
-    USD,
-    TRY,
-    EURO
+    USD, TRY, EURO, IDR, KRW, HUF, ISK, JPY, INR,
+    RUB, PHP, THB, CZK, MXN, ZAR, SEK, NOK, HKD,
+    CNY, DKK, HRK, RON, MYR, BRL, PLN, ILS, BGN,
+    NZD, AUD, SGD, CAD, CHF, EUR, GBP
 }
 
 @Data
@@ -138,6 +139,27 @@ data class ExpenseGroupInvitationView(
         var createdAt: Date
 ) {
     constructor() : this("", "", "", null, Date())
+
+    @PrePersist
+    fun createdAt() {
+        this.createdAt = Date()
+    }
+}
+
+@Entity
+@Table(
+        indexes = [
+            Index(name = "id", columnList = "id", unique = true),
+            Index(name = "symbol", columnList = "symbol", unique = false)
+        ]
+)
+data class CurrencyExchangeRate(
+        @Id var id: String,
+        var symbol: String,
+        var rate: Double,
+        var createdAt: Date
+) {
+    constructor() : this("", "", .0, Date())
 
     @PrePersist
     fun createdAt() {

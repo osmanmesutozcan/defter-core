@@ -1,6 +1,7 @@
 package io.defter.core.app.peripheral;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.spring.eventhandling.scheduling.java.SimpleEventSchedulerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;

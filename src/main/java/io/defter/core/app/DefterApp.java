@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAspectJAutoProxy
 @SpringBootApplication
-@EnableScheduling
 public class DefterApp {
 
   public static void main(String[] args) {
