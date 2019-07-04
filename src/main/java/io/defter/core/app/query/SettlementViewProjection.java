@@ -38,7 +38,8 @@ public class SettlementViewProjection {
     settlements.forEach(entityManager::persist);
   }
 
-  private SettlementView createSettlementViewForMember(List<ExpenseGroupMember> members, ExpenseGroupMember currentMember, String groupId) {
+  private SettlementView createSettlementViewForMember(List<ExpenseGroupMember> members,
+      ExpenseGroupMember currentMember, String groupId) {
     List<SettlementBalance> balances = members
         .stream()
         .filter(m -> !m.getId().equals(currentMember.getId()))

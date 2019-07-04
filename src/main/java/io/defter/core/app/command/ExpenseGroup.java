@@ -44,17 +44,21 @@ public class ExpenseGroup {
         .map(SplitMember::getId)
         .collect(Collectors.toList());
 
-    memberIds.add(cmd.getSubmittedBy());
-    memberIds.add(cmd.getPayedBy());
-
     List<String> groupMemberIds = members
         .stream()
         .map(ExpenseGroupMember::getId)
         .collect(Collectors.toList());
 
+    if (!groupMemberIds.contains(cmd.getSubmittedBy())) {
+      throw new IllegalStateException("User needs to be a part of group to be able to add a split");
+    }
+    if (!groupMemberIds.contains(cmd.getPayedBy())) {
+      throw new IllegalStateException("User needs to be a part of group to be able to pay a split");
+    }
     if (!groupMemberIds.containsAll(memberIds)) {
       throw new IllegalStateException("Split contains a member who is not part of this group");
     }
+
     apply(new SplitAddedToGroup(cmd.getId(), cmd.getAmount(), cmd.getPayedBy(), cmd.getDescription(),
         cmd.getSubmittedBy(), cmd.getCreatedAt(), cmd.getMembers()));
   }

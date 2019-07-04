@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -59,7 +60,7 @@ public class Mutation implements GraphQLMutationResolver {
     FetchUserViewByEmail query = new FetchUserViewByEmail(email);
     UserView user = queryGateway.query(query, ResponseTypes.instanceOf(UserView.class)).join();
 
-    Authentication authentication = new UsernamePasswordAuthenticationToken(email, password,
+    Authentication authentication = new UsernamePasswordAuthenticationToken(user, password,
         List.of(new SimpleGrantedAuthority("USER")));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -99,16 +100,31 @@ public class Mutation implements GraphQLMutationResolver {
   }
 
   public String answerToGroupInvitation(String invitationRequestId, InvitationAnswer answer) {
-    AnswerExpenseGroupInvitation command = new AnswerExpenseGroupInvitation(invitationRequestId, "", answer);
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    String currentUserId = ((UserView) principal).getId();
+
+    AnswerExpenseGroupInvitation command = new AnswerExpenseGroupInvitation(invitationRequestId, currentUserId, answer);
     commandGateway.sendAndWait(command);
     return "DONE";
   }
 
-  public String addSplitToGroup(String groupId, String payedBy, Double total, String description,
-      List<SplitMember> members) {
+  public String addSplitToGroup(
+      String groupId,
+      String payedBy,
+      Double total,
+      String description,
+      List<SplitMember> members
+  ) {
+
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    String currentUserId = ((UserView) principal).getId();
+
     Date createdAt = new Date();
-    AddSplitToGroup command = new AddSplitToGroup(groupId, total, payedBy, description, "",
-        createdAt, members);
+    AddSplitToGroup command = new AddSplitToGroup(
+        groupId, total, payedBy, description,
+        currentUserId, createdAt, members
+    );
+
     commandGateway.sendAndWait(command);
     return groupId;
   }
