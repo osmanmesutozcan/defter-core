@@ -1,8 +1,9 @@
-package io.defter.core.app.query;
+package io.defter.core.app.query.group;
 
 import io.defter.core.app.api.*;
 import io.defter.core.app.api.ExpenseGroupCreated;
 import io.defter.core.app.command.ExpenseGroup;
+import io.defter.core.app.query.QueryConstants;
 import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,11 @@
-package io.defter.core.app.query;
+package io.defter.core.app.query.group;
 
 import io.defter.core.app.api.ExpenseGroupInvitationAccepted;
 import io.defter.core.app.api.ExpenseGroupInvitationRejected;
 import io.defter.core.app.api.ExpenseGroupInvitationSent;
 import io.defter.core.app.api.ExpenseGroupInvitationView;
 import io.defter.core.app.api.FetchInvitationsOfUser;
+import io.defter.core.app.query.QueryConstants;
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement.InvitationAnswer;
 import java.util.Date;
 import java.util.List;

@@ -1,9 +1,10 @@
-package io.defter.core.app.query;
+package io.defter.core.app.query.directory;
 
 import io.defter.core.app.api.ExpenseGroupCreated;
 import io.defter.core.app.api.ExpenseGroupInvitationAccepted;
 import io.defter.core.app.api.ExpenseGroupInvitationRejected;
 import io.defter.core.app.api.SplitAddedToGroup;
+import io.defter.core.app.query.QueryConstants;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;

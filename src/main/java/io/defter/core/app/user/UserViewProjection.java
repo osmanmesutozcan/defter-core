@@ -1,4 +1,4 @@
-package io.defter.core.app.query;
+package io.defter.core.app.user;
 
 import io.defter.core.app.api.*;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 @Profile("query")
 @RequiredArgsConstructor
-@ProcessingGroup(QueryConstants.USER_PROCESSOR)
+@ProcessingGroup(UserConstants.USER_PROCESSOR)
 public class UserViewProjection {
 
   private final EntityManager entityManager;
