@@ -9,6 +9,8 @@ import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
+import org.axonframework.modelling.command.AggregateMember;
+import org.axonframework.modelling.command.AggregateRoot;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.springframework.context.annotation.Profile;
 
@@ -85,7 +87,7 @@ public class ExpenseGroup {
     if (!groupMemberIds.contains(cmd.getPayedBy())) {
       throw new IllegalStateException("User needs to be a part of group to be able to pay a split");
     }
-    if (!memberIds.containsAll(groupMemberIds)) {
+    if (!groupMemberIds.containsAll(memberIds)) {
       throw new IllegalStateException("Split contains a member who is not part of this group");
     }
 
@@ -94,23 +96,23 @@ public class ExpenseGroup {
   }
 
   @CommandHandler
-  public void handle(AcceptExpenseGroupInvitation event) {
+  public void handle(AcceptExpenseGroupInvitation command) {
     apply(
         new ExpenseGroupInvitationAccepted(
-            event.getGroupId(),
-            event.getInvitedUserId(),
-            event.getInvitationRequestId()
+            command.getGroupId(),
+            command.getInvitedUserId(),
+            command.getInvitationRequestId()
         )
     );
   }
 
   @CommandHandler
-  public void handle(RejectExpenseGroupInvitation event) {
+  public void handle(RejectExpenseGroupInvitation command) {
     apply(
         new ExpenseGroupInvitationRejected(
-            event.getGroupId(),
-            event.getInvitedUserId(),
-            event.getInvitationRequestId()
+            command.getGroupId(),
+            command.getInvitedUserId(),
+            command.getInvitationRequestId()
         )
     );
   }

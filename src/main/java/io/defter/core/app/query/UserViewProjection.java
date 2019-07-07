@@ -83,6 +83,10 @@ public class UserViewProjection {
         .map(UserAffiliateView::getFriendId)
         .collect(Collectors.toList());
 
+    if (affiliates.size() == 0) {
+      return log.exit(List.of());
+    }
+
     TypedQuery<UserView> usersQuery = entityManager
         .createNamedQuery("UserView.fetchWhereIdIn", UserView.class)
         .setParameter("idsList", affiliates);

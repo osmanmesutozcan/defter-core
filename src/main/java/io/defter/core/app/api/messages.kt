@@ -3,7 +3,6 @@ package io.defter.core.app.api
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement
 import io.defter.core.app.saga.MemberInvitationManagement
 import org.axonframework.modelling.command.TargetAggregateIdentifier
-import org.springframework.data.annotation.CreatedBy
 import java.util.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.Min
@@ -32,12 +31,14 @@ data class UserCreated(
  */
 open class SendMemberInvitation(
         @TargetAggregateIdentifier @NotNull val invitationRequestId: String,
-        @NotNull val invitedUserId: String
+        @NotNull val invitedUserId: String,
+        val invitedUserEmail: String
 )
 
 data class MemberInvitationSent(
         val invitationRequestId: String,
-        val invitedUserId: String
+        val invitedUserId: String,
+        val invitedUserEmail: String
 )
 
 data class AnswerMemberInvitation(
@@ -82,12 +83,14 @@ data class MemberInvitationRejected(
 data class SendExpenseGroupInvitation(
         @TargetAggregateIdentifier @NotNull val invitationRequestId: String,
         @NotNull val invitedUserId: String,
+        @NotNull val invitedUserEmail: String,
         @NotNull val groupId: String
 )
 
 data class ExpenseGroupInvitationSent(
         val invitationRequestId: String,
         val invitedUserId: String,
+        val invitedUserEmail: String,
         val groupId: String
 )
 
@@ -173,7 +176,62 @@ data class SplitAddedToGroup(
         val currency: Currency
 )
 
+//
+// Expense Group Settlement
+//
+data class RequestExpenseGroupSettlement(
+        @TargetAggregateIdentifier val id: String,
+        val settledBy: String
+)
+
+data class ExpenseGroupSettlementRequested(
+        @TargetAggregateIdentifier val id: String,
+        val settledBy: String
+)
+
+data class AnswerExpenseGroupSettlementRequest(
+        @TargetAggregateIdentifier val id: String,
+        val answeredBy: String
+)
+
+data class ExpenseGroupSettlementRequestAnswered(
+        @TargetAggregateIdentifier val id: String,
+        val answeredBy: String
+)
+
+data class AcceptExpenseGroupSettlementRequest(
+        @TargetAggregateIdentifier val id: String,
+        val answeredBy: String
+)
+
+data class ExpenseGroupSettlementRequestAccepted(
+        val id: String,
+        val answeredBy: String
+)
+
+data class RejectExpenseGroupSettlementRequest(
+        @TargetAggregateIdentifier val id: String,
+        val answeredBy: String
+)
+
+data class ExpenseGroupSettlementRequestRejected(
+        val id: String,
+        val answeredBy: String
+)
+
 // PERIPHERAL EVENTS
+
+data class PushNotificationDispatched (
+        val userId: String,
+        val title: String,
+        val body: String
+)
+
+data class EmailDispatched (
+        val email: String,
+        val title: String,
+        val body: String
+)
 
 data class ScheduledElapsed(
         val description: String,

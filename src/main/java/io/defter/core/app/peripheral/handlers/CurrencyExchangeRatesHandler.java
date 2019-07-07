@@ -1,10 +1,12 @@
-package io.defter.core.app.peripheral;
+package io.defter.core.app.peripheral.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.defter.core.app.api.Currency;
 import io.defter.core.app.api.CurrencyExchangeRate;
 import io.defter.core.app.api.ScheduledElapsed;
 import io.defter.core.app.core.CustomConfigurationProperties;
+import io.defter.core.app.peripheral.PeripheralConstants;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,10 +31,10 @@ import org.springframework.stereotype.Component;
  */
 @XSlf4j
 @Component
-@Profile("query")
+@Profile("peripheral")
 @RequiredArgsConstructor
 @ProcessingGroup(PeripheralConstants.EXCHANGE_RATES_PROCESSOR)
-public class CurrencyExchangeRatesProjection {
+public class CurrencyExchangeRatesHandler {
 
   private final EntityManager entityManager;
   private final CustomConfigurationProperties config;
@@ -43,6 +45,10 @@ public class CurrencyExchangeRatesProjection {
   public void on(ScheduledElapsed event) {
     log.debug("handling {}", event);
     ExchangeRateResponse rates = getLatestExchangeRates();
+    if (rates.getRates() == null) {
+      return;
+    }
+
     rates.getRates().forEach(this::saveExchangeRate);
     log.debug("Finished updating exchange rates");
   }
@@ -80,7 +86,7 @@ public class CurrencyExchangeRatesProjection {
     }
   }
 
-  private void saveExchangeRate(String symbol, Double rate) {
+  private void saveExchangeRate(Currency symbol, Double rate) {
     entityManager.persist(new CurrencyExchangeRate(
         UUID.randomUUID().toString(),
         symbol,
@@ -94,6 +100,6 @@ public class CurrencyExchangeRatesProjection {
 
     private String base;
     private String date;
-    private HashMap<String, Double> rates;
+    private HashMap<Currency, Double> rates;
   }
 }

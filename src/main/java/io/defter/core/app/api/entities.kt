@@ -92,9 +92,10 @@ data class SplitView(
         var submittedBy: String,
         var createdAt: Date, // client provided date to make sure we know the origin time.
         var currency: Currency,
+        var rate: Double,
         @ElementCollection var members: List<SplitMember>
 ) {
-    constructor() : this("", .0, "", "", "", "", Date(), Currency.USD, ArrayList<SplitMember>())
+    constructor() : this("", .0, "", "", "", "", Date(), Currency.USD, .0, ArrayList<SplitMember>())
 }
 
 @Embeddable
@@ -153,13 +154,33 @@ data class ExpenseGroupInvitationView(
             Index(name = "symbol", columnList = "symbol", unique = false)
         ]
 )
+@NamedQueries(
+        NamedQuery(name = "CurrencyExchangeRate.getLatestBySymbol", query = "SELECT c FROM CurrencyExchangeRate c WHERE c.symbol = :symbol ORDER BY c.createdAt DESC")
+)
 data class CurrencyExchangeRate(
         @Id var id: String,
-        var symbol: String,
+        @Enumerated(EnumType.STRING) var symbol: Currency,
         var rate: Double,
         var createdAt: Date
 ) {
-    constructor() : this("", "", .0, Date())
+    constructor() : this("", Currency.USD, .0, Date())
+
+    @PrePersist
+    fun createdAt() {
+        this.createdAt = Date()
+    }
+}
+
+@Entity
+data class ActivityView(
+        @Id var id: String,
+        var actor: String,
+        var verb: String,
+        var activityObject: String,
+        var foreignId: String,
+        var createdAt: Date
+) {
+    constructor() : this("", "", "", "", "", Date())
 
     @PrePersist
     fun createdAt() {

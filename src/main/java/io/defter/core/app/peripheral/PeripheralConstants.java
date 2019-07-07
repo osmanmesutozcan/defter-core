@@ -1,5 +1,6 @@
 package io.defter.core.app.peripheral;
 
-class PeripheralConstants {
-    static final String EXCHANGE_RATES_PROCESSOR = "exchange-rates";
+public class PeripheralConstants {
+    public static final String EXCHANGE_RATES_PROCESSOR = "exchange-rates";
+    public static final String NOTIFICATION_PROCESSOR = "notification-processor";
 }

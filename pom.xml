@@ -30,6 +30,7 @@
     <tomee-servlet-api.version>8.5.11</tomee-servlet-api.version>
     <axon.version>4.1.1</axon.version>
     <lombok.version>1.18.0</lombok.version>
+    <junit.version>4.11</junit.version>
   </properties>
 
   <dependencies>
@@ -166,7 +167,22 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-actuator</artifactId>
     </dependency>
+
+  <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.axonframework</groupId>
+      <artifactId>axon-test</artifactId>
+      <version>4.0.3</version>
+    </dependency>
+
   </dependencies>
+
 
   <build>
     <plugins>

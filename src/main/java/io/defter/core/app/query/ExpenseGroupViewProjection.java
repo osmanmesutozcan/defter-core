@@ -2,6 +2,7 @@ package io.defter.core.app.query;
 
 import io.defter.core.app.api.*;
 import io.defter.core.app.api.ExpenseGroupCreated;
+import io.defter.core.app.command.ExpenseGroup;
 import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -64,12 +65,15 @@ public class ExpenseGroupViewProjection {
         .filter(m -> !m.equals(event.getInvitedUserId()))
         .collect(Collectors.toList());
 
-    friends.forEach(friend -> saveAffiliation(event.getInvitedUserId(), friend));
+    friends.forEach(friend -> saveAffiliation(friend, event.getInvitedUserId()));
   }
 
+  /**
+   * Adds `user` as a friend to `friend` so now `friend` can see `user`s information.
+   */
   private void saveAffiliation(String member, String friend) {
     // Here we cannot use class level entityManager because we want to catch the
-    // unique contraint error.
+    // unique constraint error.
     String id = UUID.randomUUID().toString();
 
     TypedQuery<Long> jpaQuery = entityManager
@@ -88,6 +92,14 @@ public class ExpenseGroupViewProjection {
   @EventHandler
   public void on(SplitAddedToGroup event) {
     log.debug("projecting {}", event);
+
+    // TODO: Maybe move this to a rate calculator.
+    CurrencyExchangeRate rate = entityManager
+        .createNamedQuery("CurrencyExchangeRate.getLatestBySymbol", CurrencyExchangeRate.class)
+        .setParameter("symbol", event.getCurrency())
+        .setMaxResults(1)
+        .getSingleResult();
+
     ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, event.getId());
     group.setBalance(group.getBalance() + event.getAmount());
     group.setNumberOfSplits(group.getNumberOfSplits() + 1);
@@ -102,7 +114,7 @@ public class ExpenseGroupViewProjection {
             id,
             event.getAmount(), event.getId(), event.getDescription(),
             event.getPayedBy(), event.getSubmittedBy(), event.getCreatedAt(),
-            event.getCurrency(), event.getMembers()));
+            event.getCurrency(), rate.getRate(), event.getMembers()));
   }
 
   @QueryHandler
@@ -115,6 +127,13 @@ public class ExpenseGroupViewProjection {
         .setMaxResults(query.getLimit());
 
     return log.exit(jpaQuery.getResultList());
+  }
+
+  @QueryHandler
+  public ExpenseGroupView handle(FetchExpenseGroupViewQuery query) {
+    log.trace("handling {}", query);
+    ExpenseGroupView group = entityManager.find(ExpenseGroupView.class, query.getId());
+    return log.exit(group);
   }
 
   @QueryHandler

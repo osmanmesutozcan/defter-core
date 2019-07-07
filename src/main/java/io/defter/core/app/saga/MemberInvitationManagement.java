@@ -1,14 +1,18 @@
 package io.defter.core.app.saga;
 
 import io.defter.core.app.api.AcceptMemberInvitation;
+import io.defter.core.app.api.EmailDispatched;
 import io.defter.core.app.api.MemberInvitationAnswered;
 import io.defter.core.app.api.MemberInvitationSent;
 import io.defter.core.app.api.RejectMemberInvitation;
+import java.time.Instant;
 import java.util.UUID;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.scheduling.java.SimpleEventScheduler;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
@@ -22,7 +26,13 @@ import org.axonframework.spring.stereotype.Saga;
 public class MemberInvitationManagement {
 
   private transient CommandGateway commandGateway;
+
+  @Inject
   private transient EntityManager entityManager;
+
+  @Inject
+  private transient SimpleEventScheduler eventScheduler;
+
   private InvitationRequestState requestState = InvitationRequestState.NOT_SENT;
 
   // We will keep track of users info internally in saga so
@@ -47,7 +57,7 @@ public class MemberInvitationManagement {
 
     this.invitedUserId = event.getInvitedUserId();
 
-    log.debug("Sending an invitation email {} {}", emailId, event);
+    eventScheduler.schedule(Instant.now(), new EmailDispatched(event.getInvitedUserId(), "title", "body"));
   }
 
   @SagaEventHandler(associationProperty = "emailId")

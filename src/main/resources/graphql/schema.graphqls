@@ -1,106 +1,123 @@
 type Query {
-    groups: [Group]!
-    invitations: [Invitation]!
-    affiliations: [Member]!
-    splits(groupId: String!): [Split]!
-    settlement(groupId: String!): Settlement!
+  groups: [Group]!
+#  activity: [Activity]!
+  invitations: [Invitation]!
+  affiliations: [Member]!
+  splits(groupId: String!): [Split]!
+  settlement(groupId: String!): Settlement!
+  groupMemberByEmail(email: String!): GroupMember!
 }
 
 type Mutation {
-    logout: Boolean!
-    login(email: String!, password: String!): AuthPayload!
-    createUser(name: String!, email: String!, password: String!): String!
-    createGroup(name: String! currency: String! members: [GroupMemberInput]!): String!
-    answerToGroupInvitation(invitationId: String, answer: InvitationAnswer): String!
+  logout: Boolean!
+  login(email: String!, password: String!): AuthPayload!
+  createUser(name: String!, email: String!, password: String!): String!
+  createGroup(name: String! currency: Currency! members: [GroupMemberInput]!): String!
+  answerToGroupInvitation(invitationId: String, answer: InvitationAnswer): String!
 
-    addSplitToGroup(
-        groupId: String!
-        payedBy: String!
-        total: Int!
-        description: String!
-        currency: Currency
-        members: [SplitMemberInput]!
-    ): String!
+  addSplitToGroup(
+    groupId: String!
+    payedBy: String!
+    total: Int!
+    description: String!
+    currency: Currency
+    members: [SplitMemberInput]!
+  ): String!
 }
 
 input SplitMemberInput {
-    id: String!
-    locked: Boolean!
-    share: Float!
+  id: String!
+  locked: Boolean!
+  share: Float!
 }
 
 input GroupMemberInput {
-    id: String!
-    email: String!
+  id: String!
+  email: String!
 }
 
 enum InvitationAnswer {
-    ACCEPTED
-    REJECTED
+  ACCEPTED
+  REJECTED
 }
 
 enum Currency {
-    USD
-    TRY
-    EURO
+  USD
+  TRY
+  EURO
 }
 
 type Invitation {
   id: String!
+  group: InvitationGroupPreview!
   answer: InvitationAnswer
 }
 
+type InvitationGroupPreview {
+  name: String!
+  currency: Currency!
+}
+
+type Activity {
+  actor: Member!
+  verb: String!
+  object: String!
+  foreignId: String!
+  time: Float!
+}
 
 # TODO: Return current user
 type AuthPayload {
-    me: Member!
-    token: String!
+  me: Member!
+  token: String!
 }
 
 type Group {
-    id: String!
-    name: String!
-    currency: String!
-    #    updateAt: String!
-    balance: Float!
-    numberOfSplits: Int!
-    members: [GroupMember]!
+  id: String!
+  name: String!
+  currency: String!
+  #    updateAt: String!
+  balance: Float!
+  numberOfSplits: Int!
+  members: [GroupMember]!
 }
 
 type GroupMember {
-    id: String!
-    email: String!
+  id: String!
+  email: String!
 }
 
 type Member {
-    id: String!
-    email: String!
-    name: String!
-    avatar: String!
+  id: String!
+  email: String!
+  name: String!
+  avatar: String!
 }
 
 type Split {
-    id: String!
-    total: Int!
-    groupId: String!
-    description: String!
-    members: [SplitMember]!
-    payedBy: Member!
-    submittedBy: Member!
+  id: String!
+  total: Int!
+  groupId: String!
+  description: String!
+  members: [SplitMember]!
+  currency: Currency!
+  rate: Float!
+  payedBy: Member!
+  submittedBy: Member!
 }
 
 type SplitMember {
-    id: String!
-    locked: Boolean!
-    share: Float!
+  id: String!
+  locked: Boolean!
+  share: Float!
 }
 
 type Settlement {
-    totalSplits: Int!
-    members: [SettlementMember]!
+  totalSplits: Int!
+  members: [SettlementMember]!
 }
 
 type SettlementMember {
-    userId: String!
-    balance: Float!
+  userId: String!
+  balance: Float!
 }

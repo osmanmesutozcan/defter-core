@@ -1,11 +1,14 @@
 package io.defter.core.app.saga;
 
 import io.defter.core.app.api.AcceptExpenseGroupInvitation;
+import io.defter.core.app.api.EmailDispatched;
 import io.defter.core.app.api.ExpenseGroupInvitationAnswered;
+import io.defter.core.app.api.PushNotificationDispatched;
 import io.defter.core.app.api.RejectExpenseGroupInvitation;
 import io.defter.core.app.api.SendExpenseGroupInvitation;
 import io.defter.core.app.api.ExpenseGroupCreated;
 import io.defter.core.app.api.ExpenseGroupMember;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +16,7 @@ import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.scheduling.java.SimpleEventScheduler;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
@@ -25,6 +29,9 @@ public class ExpenseGroupInvitationManagement {
 
   @Inject
   private transient CommandGateway commandGateway;
+
+  @Inject
+  private transient SimpleEventScheduler eventScheduler;
 
   private String groupId;
   private InvitationRequestState requestState = InvitationRequestState.NOT_SENT;
@@ -50,16 +57,18 @@ public class ExpenseGroupInvitationManagement {
     //      That's a very leaky logic though. Where must be an easier way
     //
     //
-    members.forEach(member -> sendInvitation(member.getId(), event.getId()));
+    members.forEach(member -> sendInvitation(member.getId(), event.getId(), member.getEmail()));
     requestState = InvitationRequestState.SENT;
   }
 
-  private void sendInvitation(String member, String group) {
+  private void sendInvitation(String member, String group, String email) {
     String invitationRequestId = groupId + ":" + member;
     SagaLifecycle.associateWith("invitationRequestId", invitationRequestId);
     this.invitedUsers.put(invitationRequestId, member);
 
-    commandGateway.send(new SendExpenseGroupInvitation(invitationRequestId, member, group));
+    commandGateway.sendAndWait(new SendExpenseGroupInvitation(invitationRequestId, member, email, group));
+    eventScheduler.schedule(Instant.now(), new PushNotificationDispatched(member, "title", "body"));
+    eventScheduler.schedule(Instant.now(), new EmailDispatched(member, "title", "body"));
   }
 
   @SagaEventHandler(associationProperty = "invitationRequestId")

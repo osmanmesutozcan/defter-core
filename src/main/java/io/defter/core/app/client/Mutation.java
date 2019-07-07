@@ -5,7 +5,6 @@ import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.servlet.GraphQLContext;
 import io.defter.core.app.api.*;
-import io.defter.core.app.core.CustomConfigurationProperties;
 import io.defter.core.app.saga.ExpenseGroupInvitationManagement.InvitationAnswer;
 import io.defter.core.app.security.Unsecured;
 import javax.persistence.EntityManager;

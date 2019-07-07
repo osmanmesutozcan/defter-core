@@ -8,6 +8,7 @@ class CountExpenseGroupViewsQuery(val filter: ExpenseGroupViewFilter = ExpenseGr
 }
 
 data class ExpenseGroupViewFilter(val idStartsWith: String = "")
+data class FetchExpenseGroupViewQuery(val id: String)
 data class FetchExpenseGroupViewsQuery(val offset: Int, val limit: Int, val filter: ExpenseGroupViewFilter)
 data class CountExpenseGroupViewsResponse(val count: Int, val lastEvent: Long)
 

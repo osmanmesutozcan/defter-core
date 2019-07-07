@@ -2,11 +2,13 @@ package io.defter.core.app.command;
 
 import graphql.GraphQLException;
 import io.defter.core.app.api.AnswerExpenseGroupInvitation;
+import io.defter.core.app.api.EmailDispatched;
 import io.defter.core.app.api.ExpenseGroupInvitationAnswered;
 import io.defter.core.app.api.ExpenseGroupInvitationSent;
 import io.defter.core.app.api.MemberInvitationAnswered;
 import io.defter.core.app.api.MemberInvitationSent;
 import io.defter.core.app.api.AnswerMemberInvitation;
+import io.defter.core.app.api.PushNotificationDispatched;
 import io.defter.core.app.api.SendExpenseGroupInvitation;
 import io.defter.core.app.api.SendMemberInvitation;
 import lombok.NoArgsConstructor;
@@ -35,7 +37,8 @@ public class Invitation {
     apply(
         new MemberInvitationSent(
             command.getInvitationRequestId(),
-            command.getInvitedUserId()
+            command.getInvitedUserId(),
+            command.getInvitedUserEmail()
         )
     );
   }
@@ -48,6 +51,7 @@ public class Invitation {
         new ExpenseGroupInvitationSent(
             command.getInvitationRequestId(),
             command.getInvitedUserId(),
+            command.getInvitedUserEmail(),
             command.getGroupId()
         )
     );
