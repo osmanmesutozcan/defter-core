@@ -27,7 +27,7 @@ public class UserViewProjection {
   public void on(UserCreated event) {
     log.debug("projecting {}", event);
     entityManager.persist(new UserView(event.getId(), event.getName(), event.getEmail(), event.getPasswordHash(),
-        "https://api.adorable.io/avatars/" + event.getName()));
+        "https://api.adorable.io/avatars/" + event.getName(), event.isVerifiedUser()));
   }
 
   @QueryHandler

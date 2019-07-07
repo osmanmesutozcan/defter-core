@@ -22,6 +22,19 @@ public class Peripheral {
   private final SimpleEventScheduler eventScheduler;
 
   /**
+   * Shared group link.
+   * When a user opens this, they will login be redirected to a read-only
+   * expense group page. Preferably a real-time page.
+   */
+  @GetMapping("/p/shared/group")
+  public void sharedGroup(
+      @RequestParam("gid") String groupId,
+      @RequestParam("astr") String authenticationString
+  ) {
+    //
+  }
+
+  /**
    * Answer an invitation to the app... We will redirect the user to a signup page where they can either signup via web
    * or signup in the app.
    */

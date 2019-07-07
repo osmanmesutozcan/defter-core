@@ -95,7 +95,7 @@ public class Query implements GraphQLQueryResolver {
 
     String id = UUID.randomUUID().toString();
     // Creates new anonymous user that will be replaced when this user logged in first time.
-    CreateUser createUser = new CreateUser(id, "", email, "");
+    CreateUser createUser = new CreateUser(id, "", email, "", false);
     // Invite this user to the application
     SendMemberInvitation sendMemberInvitation = new SendMemberInvitation("INV:" + id, id, email);
 
@@ -104,7 +104,7 @@ public class Query implements GraphQLQueryResolver {
     // We could add a flag to user view like 'isAnanymous' and pick that up in saga.
     commandGateway.sendAndWait(sendMemberInvitation);
 
-    return new UserView(id, "", email, "", "");
+    return new UserView(id, "", email, "", "", false);
   }
 
   @Data

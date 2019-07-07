@@ -27,8 +27,10 @@ public class User {
   @CommandHandler
   public User(CreateUser command) {
     log.debug("handling {}", command);
+
     // TODO: We should hash this password here.
-    apply(new UserCreated(command.getId(), command.getName(), command.getEmail(), command.getPassword()));
+    apply(new UserCreated(command.getId(), command.getName(), command.getEmail(), command.getPassword(),
+        command.isVerifiedUser()));
   }
 
   @CommandHandler

@@ -1,4 +1,4 @@
-package io.defter.core.app.query.directory;
+package io.defter.core.app.query.activity;
 
 import io.defter.core.app.api.ExpenseGroupCreated;
 import io.defter.core.app.api.ExpenseGroupInvitationAccepted;

@@ -27,9 +27,10 @@ data class UserView(
         var name: String,
         var email: String,
         var passwordHash: String,
-        var avatar: String
+        var avatar: String,
+        var isVerified: Boolean
 ) {
-    constructor() : this("", "", "", "", "")
+    constructor() : this("", "", "", "", "", false)
 }
 
 @Entity

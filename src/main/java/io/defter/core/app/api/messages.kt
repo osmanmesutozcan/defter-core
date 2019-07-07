@@ -16,14 +16,16 @@ data class CreateUser(
         @TargetAggregateIdentifier val id: String,
         @NotNull @Size(min = 5) val name: String,
         @NotNull @Email val email: String,
-        @NotNull val password: String
+        @NotNull val password: String,
+        @NotNull val isVerifiedUser: Boolean
 )
 
 data class UserCreated(
         val id: String,
         val name: String,
         val email: String,
-        val passwordHash: String
+        val passwordHash: String,
+        val isVerifiedUser: Boolean
 )
 
 /**

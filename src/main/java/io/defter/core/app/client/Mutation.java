@@ -41,7 +41,7 @@ public class Mutation implements GraphQLMutationResolver {
   @Unsecured
   public String createUser(String name, String email, String password) {
     String id = UUID.randomUUID().toString();
-    CreateUser command = new CreateUser(id, name, email, password);
+    CreateUser command = new CreateUser(id, name, email, password, true);
 
     if (userExists(email)) {
       throw new GraphQLException("User already exists");
@@ -115,8 +115,7 @@ public class Mutation implements GraphQLMutationResolver {
       List<SplitMember> members
   ) {
 
-    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    String currentUserId = ((UserView) principal).getId();
+    String currentUserId = getCurrentUser().getId();
     Date createdAt = new Date();
 
     AddSplitToGroup command = new AddSplitToGroup(
@@ -132,8 +131,8 @@ public class Mutation implements GraphQLMutationResolver {
   // TODO: Move this to a repository or something.
   private Boolean userExists(String email) {
     TypedQuery<Long> jpaQuery = entityManager
-        .createNamedQuery("UserView.existsByEmail", Long.class);
-    jpaQuery.setParameter("email", email);
+        .createNamedQuery("UserView.existsByEmail", Long.class)
+        .setParameter("email", email);
 
     return jpaQuery.getSingleResult().intValue() > 0;
   }
