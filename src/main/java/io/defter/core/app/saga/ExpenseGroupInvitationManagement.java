@@ -47,17 +47,18 @@ public class ExpenseGroupInvitationManagement {
       return;
     }
 
-    groupId = event.getId();
+    this.groupId = event.getId();
 
-    List<ExpenseGroupMember> members = event.getMembers();
-    // TODO: Check who created the group and automatically accept group invitation for that user.
-    //      Projection should also do something similar where it does not actually persist that invitation
-    //      for users own create group invitations.
-    //      ...
-    //      That's a very leaky logic though. Where must be an easier way
-    //
-    //
-    members.forEach(member -> sendInvitation(member.getId(), event.getId(), member.getEmail()));
+    event.getMembers()
+        .stream()
+        // TODO: Check who created the group and automatically accept group invitation for that user.
+        //      Projection should also do something similar where it does not actually persist that invitation
+        //      for users own create group invitations.
+        //      ...
+        //      That's a very leaky logic though. There must be an easier way
+        .filter(member -> !member.getId().equals(event.getCreatedBy()))
+        .forEach(member -> sendInvitation(member.getId(), event.getId(), member.getEmail()));
+
     requestState = InvitationRequestState.SENT;
   }
 
