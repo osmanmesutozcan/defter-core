@@ -9,8 +9,6 @@ import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
-import org.axonframework.modelling.command.AggregateMember;
-import org.axonframework.modelling.command.AggregateRoot;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.springframework.context.annotation.Profile;
 

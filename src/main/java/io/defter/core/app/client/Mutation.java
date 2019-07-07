@@ -1,6 +1,7 @@
 package io.defter.core.app.client;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
+import graphql.GraphQL;
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.servlet.GraphQLContext;
@@ -68,6 +69,11 @@ public class Mutation implements GraphQLMutationResolver {
     HttpServletRequest request = context.getHttpServletRequest().get();
     HttpSession httpSession = request.getSession(true);
     httpSession.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+    if (!user.isVerified()) {
+      // TODO: Welcome and finish registration...
+      return new AuthPayload(user, httpSession.getId());
+    }
 
     return new AuthPayload(user, httpSession.getId());
   }

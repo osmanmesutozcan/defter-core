@@ -178,49 +178,6 @@ data class SplitAddedToGroup(
         val currency: Currency
 )
 
-//
-// Expense Group Settlement
-//
-data class RequestExpenseGroupSettlement(
-        @TargetAggregateIdentifier val id: String,
-        val settledBy: String
-)
-
-data class ExpenseGroupSettlementRequested(
-        @TargetAggregateIdentifier val id: String,
-        val settledBy: String
-)
-
-data class AnswerExpenseGroupSettlementRequest(
-        @TargetAggregateIdentifier val id: String,
-        val answeredBy: String
-)
-
-data class ExpenseGroupSettlementRequestAnswered(
-        @TargetAggregateIdentifier val id: String,
-        val answeredBy: String
-)
-
-data class AcceptExpenseGroupSettlementRequest(
-        @TargetAggregateIdentifier val id: String,
-        val answeredBy: String
-)
-
-data class ExpenseGroupSettlementRequestAccepted(
-        val id: String,
-        val answeredBy: String
-)
-
-data class RejectExpenseGroupSettlementRequest(
-        @TargetAggregateIdentifier val id: String,
-        val answeredBy: String
-)
-
-data class ExpenseGroupSettlementRequestRejected(
-        val id: String,
-        val answeredBy: String
-)
-
 // PERIPHERAL EVENTS
 
 data class PushNotificationDispatched (
