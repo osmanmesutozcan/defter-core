@@ -178,6 +178,52 @@ data class SplitAddedToGroup(
         val currency: Currency
 )
 
+/**
+ *  Archives an expense group.
+ *  This action is undoable.
+ */
+data class ArchiveExpenseGroup (
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val submittedBy: String
+)
+
+data class ExpenseGroupArchived (
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val submittedBy: String
+)
+
+/**
+ * All of group debt between members is settled.
+ * This event is undoable.
+ */
+data class SettleExpenseGroup (
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val submittedBy: String
+)
+
+data class ExpenseGroupSettled (
+        val groupId: String,
+        val submittedBy: String
+)
+
+/**
+ * A certain amount between the members of a group
+ * is settled. This event is undoable
+ */
+data class SettleMember (
+        @TargetAggregateIdentifier val groupId: String,
+        @NotNull val submittedBy: String,
+        @NotNull val amount: Double,
+        @NotNull val currency: Currency
+)
+
+data class MemberSettled (
+        val groupId: String,
+        val submittedBy: String,
+        val amount: Double,
+        val currency: Currency
+)
+
 // PERIPHERAL EVENTS
 
 data class PushNotificationDispatched (
