@@ -1,6 +1,7 @@
-package io.defter.core.app.user;
+package io.defter.core.app.user.query;
 
 import io.defter.core.app.api.*;
+import io.defter.core.app.user.UserConstants;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;

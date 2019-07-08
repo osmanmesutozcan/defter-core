@@ -1,4 +1,4 @@
-package io.defter.core.app.command;
+package io.defter.core.app.user.command;
 
 import io.defter.core.app.api.AcceptMemberInvitation;
 import io.defter.core.app.api.MemberInvitationAccepted;
