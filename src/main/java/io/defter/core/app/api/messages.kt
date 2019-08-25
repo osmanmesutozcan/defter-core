@@ -182,57 +182,60 @@ data class SplitAddedToGroup(
  *  Archives an expense group.
  *  This action is undoable.
  */
-data class ArchiveExpenseGroup (
+data class ArchiveExpenseGroup(
         @TargetAggregateIdentifier val groupId: String,
         @NotNull val submittedBy: String
 )
 
-data class ExpenseGroupArchived (
-        @TargetAggregateIdentifier val groupId: String,
-        @NotNull val submittedBy: String
-)
+data class ExpenseGroupArchived(
+        val groupId: String,
+        override val undoableActionId: String,
+        val submittedBy: String
+) : IUndoableAction
 
 /**
  * All of group debt between members is settled.
  * This event is undoable.
  */
-data class SettleExpenseGroup (
+data class SettleExpenseGroup(
         @TargetAggregateIdentifier val groupId: String,
         @NotNull val submittedBy: String
 )
 
-data class ExpenseGroupSettled (
+data class ExpenseGroupSettled(
         val groupId: String,
+        override val undoableActionId: String,
         val submittedBy: String
-)
+) : IUndoableAction
 
 /**
  * A certain amount between the members of a group
  * is settled. This event is undoable
  */
-data class SettleMember (
+data class SettleMember(
         @TargetAggregateIdentifier val groupId: String,
         @NotNull val submittedBy: String,
         @NotNull val amount: Double,
         @NotNull val currency: Currency
 )
 
-data class MemberSettled (
+data class MemberSettled(
         val groupId: String,
+        override val undoableActionId: String,
         val submittedBy: String,
         val amount: Double,
         val currency: Currency
-)
+) : IUndoableAction
 
 // PERIPHERAL EVENTS
 
-data class PushNotificationDispatched (
+data class PushNotificationDispatched(
         val userId: String,
         val title: String,
         val body: String
 )
 
-data class EmailDispatched (
+data class EmailDispatched(
         val email: String,
         val title: String,
         val body: String
@@ -245,4 +248,9 @@ data class ScheduledElapsed(
 
 enum class ScheduledEventTypes {
     EXCHANGE_RATES_UPDATES
+}
+
+// TODO: Finish this..
+interface IUndoableAction {
+    val undoableActionId: String;
 }
